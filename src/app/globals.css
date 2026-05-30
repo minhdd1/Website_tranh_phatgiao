@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ivory: #FAF8F4;
+  --color-beige-warm: #EFE7DF;
+  --color-rose-dusty: #F3E6E4;
+  --color-charcoal: #2F2F2F;
+  --color-gray-soft: #8D8D8D;
+
+  --font-display: var(--font-cormorant), serif;
+  --font-body: var(--font-lora), serif;
+}
+
+:root {
+  --background: #FAF8F4;
+  --foreground: #2F2F2F;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle fade-in animations for calm page loads */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
