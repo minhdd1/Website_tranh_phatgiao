@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 
-// Setup optional Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+const googleSheetsUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL || '';
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +14,7 @@ export async function POST(request: Request) {
     // Simulate standard studio slow delay (800ms) for high-end organic feel
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    console.log('Commission Inquiry Received:', {
+    console.log('Commission Inquiry Received (Saving to Google Sheets):', {
       name,
       email,
       phone,
@@ -30,25 +25,40 @@ export async function POST(request: Request) {
       message,
     });
 
-    if (supabase) {
-      const { error } = await supabase.from('commission_requests').insert([
-        {
-          name,
-          email,
-          phone: phone || null,
-          country,
-          artwork_type,
-          dimensions,
-          budget,
-          message,
-          status: 'new',
-        },
-      ]);
+    if (googleSheetsUrl) {
+      try {
+        const response = await fetch(googleSheetsUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'commission',
+            name,
+            email,
+            phone: phone || '',
+            country,
+            artwork_type,
+            dimensions,
+            budget,
+            message,
+            created_at: new Date().toISOString(),
+          }),
+        });
 
-      if (error) {
-        console.error('Supabase save error:', error);
-        // Fallback to success response so user demo works seamlessly
+        if (!response.ok) {
+          console.error('Google Sheets POST error status:', response.status);
+        } else {
+          const resData = await response.json();
+          if (resData.success) {
+            console.log('Successfully saved to Google Sheets');
+          } else {
+            console.error('Google Sheets save error message:', resData.error);
+          }
+        }
+      } catch (postErr) {
+        console.error('Failed to post to Google Sheets Web App:', postErr);
       }
+    } else {
+      console.log('Simulated saving to Google Sheets: process.env.GOOGLE_SHEETS_WEBAPP_URL is not configured.');
     }
 
     return NextResponse.json({ success: true, message: 'Inquiry received successfully' });

@@ -29,7 +29,7 @@ export default function GalleryPage() {
     { value: 'silk-painting', label: locale === 'vi' ? 'Tranh Lụa' : 'Silk Paintings' },
     { value: 'sculptural-painting', label: locale === 'vi' ? 'Tranh Đắp Nổi' : 'Sculptural Paintings' },
     { value: 'buddhist-art', label: locale === 'vi' ? 'Tranh Phật Giáo' : 'Buddhist Art' },
-    { value: 'commissioned', label: locale === 'vi' ? 'Đã Giao' : 'Commissioned' },
+    { value: 'commissioned', label: 'Napkin Decoupage' },
   ];
 
   return (

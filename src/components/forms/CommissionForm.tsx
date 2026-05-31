@@ -16,7 +16,7 @@ export default function CommissionForm({ locale }: CommissionFormProps) {
   const [country, setCountry] = useState('');
   const [artworkType, setArtworkType] = useState<ArtworkCategory>('silk-painting');
   const [dimensions, setDimensions] = useState('80x100cm');
-  const [budget, setBudget] = useState('20,000,000 - 35,000,000 VND');
+  const [budget, setBudget] = useState('under-2M');
   const [message, setMessage] = useState('');
   
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -63,6 +63,7 @@ export default function CommissionForm({ locale }: CommissionFormProps) {
     { value: 'silk-painting', label: locale === 'vi' ? 'Tranh Lụa Tự Nhiên' : 'Organic Silk Painting' },
     { value: 'sculptural-painting', label: locale === 'vi' ? 'Tranh Đắp Nổi Thạch Cao' : 'Sculptural Plaster Painting' },
     { value: 'buddhist-art', label: locale === 'vi' ? 'Tranh Phật Giáo Chánh Niệm' : 'Mindful Buddhist Art' },
+    { value: 'commissioned', label: locale === 'vi' ? 'Tranh Napkin Decoupage' : 'Napkin Decoupage Art' },
   ];
 
   const sizeOptions = [
@@ -74,9 +75,12 @@ export default function CommissionForm({ locale }: CommissionFormProps) {
   ];
 
   const budgetOptions = [
-    { value: '15M-30M VND', label: '15,000,000 – 30,000,000 VND ($600 - $1200 USD)' },
-    { value: '30M-50M VND', label: '30,000,000 – 50,000,000 VND ($1200 - $2000 USD)' },
-    { value: '50M+ VND', label: '50,000,000+ VND ($2000+ USD)' },
+    { value: 'under-2M', label: locale === 'vi' ? 'Dưới 2,000,000 VND ($80 USD)' : 'Under 2,000,000 VND ($80 USD)' },
+    { value: '2M-5M', label: locale === 'vi' ? '2,000,000 – 5,000,000 VND ($80 - $200 USD)' : '2,000,000 – 5,000,000 VND ($80 - $200 USD)' },
+    { value: '5M-15M', label: locale === 'vi' ? '5,000,000 – 15,000,000 VND ($200 - $600 USD)' : '5,000,000 – 15,000,000 VND ($200 - $600 USD)' },
+    { value: '15M-30M', label: '15,000,000 – 30,000,000 VND ($600 - $1200 USD)' },
+    { value: '30M-50M', label: '30,000,000 – 50,000,000 VND ($1200 - $2000 USD)' },
+    { value: '50M+', label: '50,000,000+ VND ($2000+ USD)' },
   ];
 
   return (
@@ -151,7 +155,7 @@ export default function CommissionForm({ locale }: CommissionFormProps) {
             <label className="font-body text-xs uppercase tracking-widest text-charcoal/70">
               {locale === 'vi' ? 'Thể Loại Tranh Quan Tâm *' : 'Select Artwork Style *'}
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {categories.map((cat) => (
                 <button
                   key={cat.value}

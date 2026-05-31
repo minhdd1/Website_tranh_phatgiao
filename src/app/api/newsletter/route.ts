@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+const googleSheetsUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL || '';
 
 export async function POST(request: Request) {
   try {
@@ -18,20 +14,35 @@ export async function POST(request: Request) {
     // Simulate delay for high-end feel
     await new Promise((resolve) => setTimeout(resolve, 600));
 
-    console.log('Newsletter Subscription:', email);
+    console.log('Newsletter Subscription (Saving to Google Sheets):', email);
 
-    if (supabase) {
-      const { error } = await supabase.from('newsletter_subscribers').insert([
-        { email },
-      ]);
+    if (googleSheetsUrl) {
+      try {
+        const response = await fetch(googleSheetsUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'newsletter',
+            email,
+            created_at: new Date().toISOString(),
+          }),
+        });
 
-      if (error) {
-        console.error('Supabase newsletter save error:', error);
-        if (error.code === '23505') {
-          // Unique key violation (already subscribed)
-          return NextResponse.json({ success: true, message: 'Already subscribed' });
+        if (!response.ok) {
+          console.error('Google Sheets POST error status:', response.status);
+        } else {
+          const resData = await response.json();
+          if (resData.success) {
+            console.log('Successfully saved newsletter subscriber to Google Sheets');
+          } else {
+            console.error('Google Sheets save error message:', resData.error);
+          }
         }
+      } catch (postErr) {
+        console.error('Failed to post newsletter subscription to Google Sheets Web App:', postErr);
       }
+    } else {
+      console.log('Simulated newsletter saving to Google Sheets: process.env.GOOGLE_SHEETS_WEBAPP_URL is not configured.');
     }
 
     return NextResponse.json({ success: true, message: 'Subscribed successfully' });

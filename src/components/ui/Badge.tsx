@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import { cn } from '@/utils/cn';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   status: 'available' | 'sold' | 'commission-open';
@@ -12,14 +15,16 @@ export default function Badge({
   children,
   ...props
 }: BadgeProps) {
+  const { t } = useTranslation();
+
   const getStatusLabel = () => {
     switch (status) {
       case 'available':
-        return 'Available';
+        return t('artwork.status.available');
       case 'sold':
-        return 'Private Collection';
+        return t('artwork.status.sold');
       case 'commission-open':
-        return 'Accepting Commission';
+        return t('artwork.status.commissionOpen');
       default:
         return '';
     }

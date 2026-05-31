@@ -50,7 +50,7 @@ export default function Footer() {
     { label: locale === 'vi' ? 'Tranh Lụa' : 'Silk Paintings', path: `/${locale}/gallery/silk-paintings` },
     { label: locale === 'vi' ? 'Tranh Đắp Nổi' : 'Sculptural Paintings', path: `/${locale}/gallery/sculptural-paintings` },
     { label: locale === 'vi' ? 'Tranh Phật Giáo' : 'Buddhist Art', path: `/${locale}/gallery/buddhist-art` },
-    { label: locale === 'vi' ? 'Tác Phẩm Đặt Riêng' : 'Commissioned Portfolio', path: `/${locale}/gallery/commissioned` },
+    { label: locale === 'vi' ? 'Tranh Napkin Decoupage' : 'Napkin Decoupage Portfolio', path: `/${locale}/gallery/commissioned` },
   ];
 
   return (

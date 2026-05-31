@@ -221,20 +221,20 @@ export const mockArtworks: ArtworkDocument[] = [
     _createdAt: new Date().toISOString(),
     _updatedAt: new Date().toISOString(),
     title: {
-      vi: 'Vòng Cát Tròn Trắng',
-      en: 'White Circular Sand',
+      vi: 'Sen Vàng Wabi-Sabi',
+      en: 'Golden Lotus Wabi-Sabi',
     },
     slug: {
       _type: 'slug',
-      current: 'white-circular-sand',
+      current: 'golden-lotus-wabi-sabi',
     },
     excerpt: {
-      vi: 'Tác phẩm đặt riêng hoàn thiện cho không gian thiền của một căn hộ Japandi tại Hà Nội.',
-      en: 'A custom-tailored commission created for a private minimalist home in Hanoi.',
+      vi: 'Tác phẩm Napkin Decoupage tinh tế kết hợp lá sen tự nhiên dát vàng trên nền gỗ sồi mộc.',
+      en: 'A delicate Napkin Decoupage artwork combining natural gilded lotus details on rustic oak.',
     },
     description: {
-      vi: 'Được đặt hàng thiết kế riêng dựa trên không gian nội thất mộc mạc và câu chuyện về vòng tròn thiền Enso biểu tượng cho sự trọn vẹn, vô thường. Tác phẩm mang tông màu kem ngà nhẹ nhàng, tích hợp bột cát sông tự nhiên để tạo chiều sâu xúc giác mộc mạc tối đa. Tác phẩm thể hiện sự hợp tác hài hòa tuyệt đối giữa tâm hồn người nghệ sĩ và không gian sống của nhà sưu tập.',
-      en: 'Comcommissioned specifically for a serene home interior, inspired by the Zen Enso circle symbolizing wholeness, empty space, and impermanence. Formulated with sand collected from local rivers, layered over a soft ivory backdrop. It stands as a harmonious dialogue between the collector\'s space and the artist\'s patient hand.',
+      vi: 'Tác phẩm "Sen Vàng Wabi-Sabi" sử dụng kỹ thuật Napkin Decoupage truyền thống để phủ những họa tiết hoa văn sen cổ tinh xảo lên nền thạch cao đắp nổi và thớ gỗ sồi tự nhiên. Bề mặt tác phẩm được xử lý tạo các vết nứt wabi-sabi hoài cổ, chấm phá bởi những nét dát vàng lá tinh tế. Đây là sự kết hợp hoàn hảo giữa hội họa thủ công nghệ thuật và nét thô mộc của tự nhiên.',
+      en: 'Golden Lotus Wabi-Sabi leverages traditional Napkin Decoupage techniques to gently apply delicate classical lotus patterns onto sculptural plaster and natural oak. The surface undergoes precise wabi-sabi distress and cracking, accented with elegant hand-gilded gold leaf. It creates a seamless dialogue between paper craft and rustic organic elements.',
     },
     category: 'commissioned',
     images: [
@@ -244,8 +244,8 @@ export const mockArtworks: ArtworkDocument[] = [
           _ref: 'image-sand-hero',
           _type: 'reference',
         },
-        alt_vi: 'Tranh vòng cát trắng tối giản Enso',
-        alt_en: 'Minimalist white sand circular Enso artwork',
+        alt_vi: 'Tranh Napkin Decoupage Sen Vàng trên thớ gỗ sồi',
+        alt_en: 'Napkin Decoupage Golden Lotus on rustic oak panel',
       },
     ],
     dimensions: {
@@ -253,21 +253,21 @@ export const mockArtworks: ArtworkDocument[] = [
       en: '100 x 100 cm',
     },
     materials: {
-      vi: 'Cát mịn tự nhiên, thạch cao và acrylic trên nền vải thô',
-      en: 'Organic river sand, plaster, and acrylic on raw canvas',
+      vi: 'Giấy napkin sợi gỗ mỏng, thạch cao đắp nổi, màu acrylic trên gỗ sồi tự nhiên',
+      en: 'Delicate wood-fiber napkin paper, plaster relief, acrylic on natural oak',
     },
     price: 36000000,
     currency: 'VND',
-    status: 'sold',
+    status: 'available',
     featured: false,
     seo: {
       title: {
-        vi: 'Tranh Đặt Riêng Vòng Cát Tròn Trắng | Kayla Nguyen',
-        en: 'White Circular Sand Commission | Kayla Nguyen',
+        vi: 'Tranh Napkin Decoupage Sen Vàng Wabi-Sabi | Kayla Nguyen',
+        en: 'Golden Lotus Wabi-Sabi Decoupage | Kayla Nguyen',
       },
       description: {
-        vi: 'Tác phẩm tranh đặt riêng Enso phong cách Wabi-sabi thanh tịnh.',
-        en: 'Bespoke Enso sand painting illustrating Zen mindfulness and slow Hanoi living.',
+        vi: 'Tác phẩm tranh Napkin Decoupage sen cổ độc bản phong cách Wabi-sabi và tối giản Japandi.',
+        en: 'Unique Napkin Decoupage artwork celebrating Zen impermanence and premium organic textures.',
       },
     },
   },
