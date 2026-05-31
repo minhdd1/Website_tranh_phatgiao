@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/utils/cn';
@@ -13,6 +14,13 @@ import LanguageSwitcher from '../navigation/LanguageSwitcher';
 export default function Header() {
   const { scrollDirection, isAtTop } = useScrollDirection();
   const { locale } = useTranslation();
+  const pathname = usePathname();
+
+  // Detect homepage root and Vietnamese path
+  const isHomepage = pathname === `/${locale}` || pathname === `/${locale}/`;
+  
+  // Use light/white colors only when transparent at the top of the homepage (dark background image)
+  const isLight = isHomepage && isAtTop;
 
   return (
     <header
@@ -28,21 +36,24 @@ export default function Header() {
         {/* Brand Logo - Minimal luxury serif */}
         <Link
           href={`/${locale}`}
-          className="font-display text-lg md:text-xl font-medium tracking-widest uppercase text-charcoal hover:opacity-75 transition-opacity duration-300"
+          className={cn(
+            'font-display text-lg md:text-xl font-medium tracking-widest uppercase transition-colors duration-500 hover:opacity-75',
+            isLight ? 'text-ivory' : 'text-charcoal'
+          )}
         >
           Kayla Nguyen
         </Link>
 
         {/* Desktop Curation Navigation */}
-        <DesktopMenu />
+        <DesktopMenu isLight={isLight} />
 
         {/* Action Items */}
         <div className="flex items-center gap-6">
           <div className="hidden md:block">
-            <LanguageSwitcher />
+            <LanguageSwitcher isLight={isLight} />
           </div>
           {/* Mobile Overlay Navigation */}
-          <MobileMenu />
+          <MobileMenu isLight={isLight} />
         </div>
       </Container>
     </header>

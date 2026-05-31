@@ -5,7 +5,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { type Locale } from '@/types';
 
-export default function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  isLight?: boolean;
+}
+
+export default function LanguageSwitcher({ isLight = false }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -26,22 +30,37 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div className="inline-flex items-center gap-2 text-xs tracking-widest font-body uppercase select-none">
+    <div className={cn(
+      'inline-flex items-center gap-2 text-xs tracking-widest font-body uppercase select-none',
+      isLight ? 'text-ivory/70' : 'text-gray-soft'
+    )}>
       <button
         onClick={() => toggleLanguage('vi')}
         className={cn(
-          'transition-colors duration-300 py-1 hover:text-charcoal cursor-pointer',
-          currentLocale === 'vi' ? 'text-charcoal border-b border-charcoal' : 'text-gray-soft'
+          'transition-colors duration-300 py-1 cursor-pointer',
+          isLight
+            ? currentLocale === 'vi'
+              ? 'text-ivory border-b border-ivory font-medium'
+              : 'text-ivory/70 hover:text-ivory'
+            : currentLocale === 'vi'
+              ? 'text-charcoal border-b border-charcoal font-medium'
+              : 'text-gray-soft hover:text-charcoal'
         )}
       >
         VI
       </button>
-      <span className="text-gray-soft/40 font-light">/</span>
+      <span className={cn('font-light', isLight ? 'text-ivory/30' : 'text-gray-soft/40')}>/</span>
       <button
         onClick={() => toggleLanguage('en')}
         className={cn(
-          'transition-colors duration-300 py-1 hover:text-charcoal cursor-pointer',
-          currentLocale === 'en' ? 'text-charcoal border-b border-charcoal' : 'text-gray-soft'
+          'transition-colors duration-300 py-1 cursor-pointer',
+          isLight
+            ? currentLocale === 'en'
+              ? 'text-ivory border-b border-ivory font-medium'
+              : 'text-ivory/70 hover:text-ivory'
+            : currentLocale === 'en'
+              ? 'text-charcoal border-b border-charcoal font-medium'
+              : 'text-gray-soft hover:text-charcoal'
         )}
       >
         EN

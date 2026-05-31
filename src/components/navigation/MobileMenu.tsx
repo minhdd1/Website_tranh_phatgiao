@@ -6,16 +6,34 @@ import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/utils/cn';
 import { Menu, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import LanguageSwitcher from './LanguageSwitcher';
+import Container from '../layout/Container';
 
-export default function MobileMenu() {
+interface MobileMenuProps {
+  isLight?: boolean;
+}
+
+export default function MobileMenu({ isLight = false }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { t, locale } = useTranslation();
 
-  // Close menu on navigation transition
+  // Mount logic for Portal SSR safety
   useEffect(() => {
-    setIsOpen(false);
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Close menu on navigation transition with timeout to prevent sync-render lint issues
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsOpen(false);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   // Prevent scroll when fullscreen menu is active
@@ -39,51 +57,64 @@ export default function MobileMenu() {
     { label: t('nav.contact'), path: `/${locale}/contact` },
   ];
 
-  return (
-    <div className="md:hidden">
-      {/* Trigger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative z-50 p-2 text-charcoal focus:outline-none cursor-pointer"
-        aria-label="Toggle menu"
-      >
-        {isOpen ? <X className="w-6 h-6 stroke-[1.5]" /> : <Menu className="w-6 h-6 stroke-[1.5]" />}
-      </button>
+  const menuOverlay = (
+    <div
+      className={cn(
+        'fixed inset-0 z-50 bg-[#FAF8F4] flex flex-col justify-between transition-all duration-700 ease-in-out transform',
+        isOpen ? 'translate-x-0 opacity-100 pointer-events-auto' : 'translate-x-full opacity-0 pointer-events-none'
+      )}
+    >
+      {/* 1. Header Row inside Menu - Matching standard header heights & lateral spacing */}
+      <div className="w-full border-b border-charcoal/5 py-6 md:py-8 bg-transparent">
+        <Container className="flex items-center justify-between">
+          <Link
+            href={`/${locale}`}
+            onClick={() => setIsOpen(false)}
+            className="font-display text-lg md:text-xl font-medium tracking-widest uppercase text-charcoal hover:opacity-75 transition-opacity duration-300"
+          >
+            Kayla Nguyen
+          </Link>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="p-2 text-charcoal focus:outline-none cursor-pointer hover:opacity-70 transition-opacity duration-200"
+            aria-label="Close menu"
+          >
+            <X className="w-6 h-6 stroke-[1.5]" />
+          </button>
+        </Container>
+      </div>
 
-      {/* Screen Overlay */}
-      <div
-        className={cn(
-          'fixed inset-0 z-40 bg-[#FAF8F4] flex flex-col justify-between p-8 pt-28 transition-transform duration-700 ease-in-out',
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        )}
-      >
-        {/* Navigation Links */}
-        <nav className="flex flex-col gap-6 text-left mt-8">
+      {/* 2. Scrollable / Centered Navigation Links */}
+      <div className="flex-1 flex flex-col justify-center py-8 overflow-y-auto">
+        <Container className="flex flex-col gap-6 text-left">
           {menuItems.map((item, idx) => {
             const isActive = pathname === item.path;
             return (
               <Link
                 key={item.path}
                 href={item.path}
+                onClick={() => setIsOpen(false)}
                 style={{
-                  transitionDelay: isOpen ? `${idx * 80}ms` : '0ms',
+                  transitionDelay: isOpen ? `${idx * 60}ms` : '0ms',
                 }}
                 className={cn(
-                  'text-3xl font-display font-light tracking-wider transition-all duration-700 transform',
+                  'text-3xl font-display font-light tracking-wider transition-all duration-500 transform',
                   isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                  isActive ? 'text-charcoal pl-3 border-l-2 border-charcoal/30' : 'text-gray-soft hover:text-charcoal'
+                  isActive ? 'text-charcoal pl-3 border-l-2 border-charcoal/30 font-medium' : 'text-gray-soft hover:text-charcoal'
                 )}
               >
                 {item.label}
               </Link>
             );
           })}
-        </nav>
+        </Container>
+      </div>
 
-        {/* Footer info inside menu */}
-        <div
+      {/* 3. Footer row at bottom inside menu */}
+      <div className="border-t border-charcoal/5 py-8 bg-transparent">
+        <Container
           className={cn(
-            'flex flex-col gap-4 border-t border-charcoal/5 pt-6 transition-all duration-700 delay-300 transform',
+            'flex flex-col gap-4 transition-all duration-700 delay-200 transform',
             isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           )}
         >
@@ -91,8 +122,29 @@ export default function MobileMenu() {
           <p className="text-[10px] tracking-widest text-gray-soft uppercase font-body">
             © {new Date().getFullYear()} Studio Journal
           </p>
-        </div>
+        </Container>
       </div>
     </div>
   );
+
+  return (
+    <div className="md:hidden">
+      {/* Trigger Button inside Header (Hidden when menu is open to prevent duplicates) */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className={cn(
+          'p-2 focus:outline-none cursor-pointer transition-all duration-300',
+          isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100',
+          isLight ? 'text-ivory hover:text-ivory/80' : 'text-charcoal hover:text-charcoal/80'
+        )}
+        aria-label="Open menu"
+      >
+        <Menu className="w-6 h-6 stroke-[1.5]" />
+      </button>
+
+      {/* Render overlay via Portal to body to avoid header transformed stacking context bounds */}
+      {mounted ? createPortal(menuOverlay, document.body) : null}
+    </div>
+  );
 }
+

@@ -49,6 +49,7 @@ export function useTranslation() {
 
   const t = (keyPath: string): string => {
     const keys = keyPath.split('.');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let current: any = dictionary;
 
     for (const key of keys) {

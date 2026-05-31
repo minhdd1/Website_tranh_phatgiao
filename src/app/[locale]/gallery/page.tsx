@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { mockArtworks } from '@/lib/mockData';
 import { type ArtworkCategory, type Locale } from '@/types';
@@ -14,15 +14,10 @@ export default function GalleryPage() {
   const locale = (params?.locale as Locale) || 'vi';
   
   const [selectedCategory, setSelectedCategory] = useState<ArtworkCategory | 'all'>('all');
-  const [filteredArtworks, setFilteredArtworks] = useState(mockArtworks);
 
-  useEffect(() => {
-    if (selectedCategory === 'all') {
-      setFilteredArtworks(mockArtworks);
-    } else {
-      setFilteredArtworks(mockArtworks.filter(art => art.category === selectedCategory));
-    }
-  }, [selectedCategory]);
+  const filteredArtworks = selectedCategory === 'all'
+    ? mockArtworks
+    : mockArtworks.filter(art => art.category === selectedCategory);
 
   const categories = [
     { value: 'all', label: locale === 'vi' ? 'Tất Cả' : 'All Works' },

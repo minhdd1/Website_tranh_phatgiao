@@ -6,7 +6,11 @@ import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/utils/cn';
 
-export default function DesktopMenu() {
+interface DesktopMenuProps {
+  isLight?: boolean;
+}
+
+export default function DesktopMenu({ isLight = false }: DesktopMenuProps) {
   const pathname = usePathname();
   const { t, locale } = useTranslation();
 
@@ -28,8 +32,14 @@ export default function DesktopMenu() {
             key={item.path}
             href={item.path}
             className={cn(
-              'text-[13px] tracking-widest font-body uppercase transition-colors duration-500 hover:text-charcoal',
-              isActive ? 'text-charcoal font-medium' : 'text-gray-soft'
+              'text-[13px] tracking-widest font-body uppercase transition-colors duration-500',
+              isLight
+                ? isActive
+                  ? 'text-ivory border-b border-ivory/30 font-medium'
+                  : 'text-ivory/70 hover:text-ivory'
+                : isActive
+                  ? 'text-charcoal font-medium border-b border-charcoal/30'
+                  : 'text-gray-soft hover:text-charcoal'
             )}
           >
             {item.label}

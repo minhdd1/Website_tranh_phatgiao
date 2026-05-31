@@ -33,9 +33,9 @@ export default async function HomePage({
   const signatureImageSrc = 'https://images.unsplash.com/photo-1459908676235-d5f02a50184b?q=80&w=1600&auto=format&fit=crop'; // close painting canvas
 
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full flex flex-col -mt-20 md:-mt-28">
       {/* 1. HERO SECTION - Full screen immersive atmosphere */}
-      <section className="relative w-full h-[85vh] flex items-center justify-center overflow-hidden border-b border-charcoal/5">
+      <section className="relative w-full h-[90vh] md:h-[85vh] min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden border-b border-charcoal/5">
         <Image
           src={heroImageSrc}
           alt="Atmospheric gallery background"

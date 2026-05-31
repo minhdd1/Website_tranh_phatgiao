@@ -62,8 +62,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, message: 'Inquiry received successfully' });
-  } catch (err: any) {
-    console.error('API Commission Route Error:', err);
+  } catch (err) {
+    const error = err as Error;
+    console.error('API Commission Route Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
