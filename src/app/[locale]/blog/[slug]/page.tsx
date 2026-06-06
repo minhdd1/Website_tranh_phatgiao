@@ -3,7 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { type Metadata } from 'next';
-import { mockBlogs, getMockImageUrl } from '@/lib/mockData';
+import { getBlogBySlug } from '@/lib/api';
+import { getImageUrl } from '@/lib/sanity';
 import { type Locale } from '@/types';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
@@ -15,7 +16,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params;
-  const blog = mockBlogs.find((post) => post.slug.current === slug);
+  const blog = await getBlogBySlug(slug);
 
   if (!blog) return {};
 
@@ -29,7 +30,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const { locale, slug } = await params;
 
   // Retrieve active journal article
-  const blog = mockBlogs.find((post) => post.slug.current === slug);
+  const blog = await getBlogBySlug(slug);
 
   if (!blog) {
     notFound();
@@ -37,7 +38,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   const title = blog.title[locale as Locale];
   const content = blog.content[locale as Locale];
-  const bannerSrc = getMockImageUrl(blog.coverImage.asset?._ref);
+  const bannerSrc = getImageUrl(blog.coverImage);
 
   return (
     <article className="w-full bg-[#FAF8F4] min-h-screen">

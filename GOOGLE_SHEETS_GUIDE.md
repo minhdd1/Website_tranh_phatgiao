@@ -39,6 +39,9 @@ function doPost(e) {
     // Automatically retrieve the spreadsheet owner's email address
     var ownerEmail = Session.getActiveUser().getEmail() || "your-email@gmail.com";
     
+    // Format timestamp in Vietnam Time (GMT+7) with dd-MM-yyyy HH-mm-ss format
+    var timestamp = Utilities.formatDate(new Date(), "GMT+7", "dd-MM-yyyy HH-mm-ss");
+    
     if (type === 'newsletter') {
       var sheet = ss.getSheetByName('Newsletter');
       if (!sheet) {
@@ -47,7 +50,7 @@ function doPost(e) {
       }
       sheet.appendRow([
         data.email,
-        data.created_at || new Date().toISOString()
+        timestamp
       ]);
       
       // SEND EMAIL NOTIFICATION FOR NEWSLETTER SIGNUP
@@ -56,7 +59,7 @@ function doPost(e) {
         subject: "🔔 Đăng ký Bản tin Mới - Kayla Nguyen Studio",
         htmlBody: "<p>Có một người đăng ký nhận bản tin mới từ website:</p>" +
                   "<p><b>Email:</b> " + data.email + "</p>" +
-                  "<p><i>Thời gian:</i> " + new Date().toLocaleString() + "</p>"
+                  "<p><i>Thời gian:</i> " + timestamp + "</p>"
       });
       
     } else {
@@ -74,7 +77,7 @@ function doPost(e) {
         data.dimensions,
         data.budget,
         data.message,
-        data.created_at || new Date().toISOString()
+        timestamp
       ]);
       
       // SEND DETAILED EMAIL NOTIFICATION FOR NEW COMMISSION REQUEST

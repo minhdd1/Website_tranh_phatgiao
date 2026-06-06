@@ -1,31 +1,17 @@
-'use client';
-
-import React, { useState } from 'react';
-import { useParams } from 'next/navigation';
-import { mockArtworks } from '@/lib/mockData';
-import { type ArtworkCategory, type Locale } from '@/types';
+import React from 'react';
+import { type Locale } from '@/types';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
-import ArtworkGrid from '@/components/artwork/ArtworkGrid';
-import { cn } from '@/utils/cn';
+import GalleryCatalog from '@/components/gallery/GalleryCatalog';
+import { getArtworks } from '@/lib/api';
 
-export default function GalleryPage() {
-  const params = useParams();
-  const locale = (params?.locale as Locale) || 'vi';
-  
-  const [selectedCategory, setSelectedCategory] = useState<ArtworkCategory | 'all'>('all');
-
-  const filteredArtworks = selectedCategory === 'all'
-    ? mockArtworks
-    : mockArtworks.filter(art => art.category === selectedCategory);
-
-  const categories = [
-    { value: 'all', label: locale === 'vi' ? 'Tất Cả' : 'All Works' },
-    { value: 'silk-painting', label: locale === 'vi' ? 'Tranh Lụa' : 'Silk Paintings' },
-    { value: 'sculptural-painting', label: locale === 'vi' ? 'Tranh Đắp Nổi' : 'Sculptural Paintings' },
-    { value: 'buddhist-art', label: locale === 'vi' ? 'Tranh Phật Giáo' : 'Buddhist Art' },
-    { value: 'commissioned', label: 'Napkin Decoupage' },
-  ];
+export default async function GalleryPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const artworks = await getArtworks();
 
   return (
     <Section spacing="default" className="bg-[#FAF8F4] min-h-[75vh]">
@@ -45,28 +31,8 @@ export default function GalleryPage() {
           </p>
         </div>
 
-        {/* Filter Navigation Bar */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 border-b border-charcoal/5 pb-6">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setSelectedCategory(cat.value as ArtworkCategory | 'all')}
-              className={cn(
-                'font-body text-[13px] tracking-widest uppercase py-1 border-b transition-all duration-500 cursor-pointer',
-                selectedCategory === cat.value
-                  ? 'text-charcoal border-charcoal font-medium'
-                  : 'text-gray-soft border-transparent hover:text-charcoal'
-              )}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
         {/* Dynamic Curated Artworks Grid */}
-        <div className="pt-8">
-          <ArtworkGrid artworks={filteredArtworks} />
-        </div>
+        <GalleryCatalog initialArtworks={artworks} locale={locale as Locale} />
       </Container>
     </Section>
   );

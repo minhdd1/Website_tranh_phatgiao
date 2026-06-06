@@ -1,5 +1,5 @@
 import React from 'react';
-import { mockArtworks } from '@/lib/mockData';
+import { getArtworksByCategory } from '@/lib/api';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
 import ArtworkGrid from '@/components/artwork/ArtworkGrid';
@@ -10,7 +10,7 @@ export default async function SilkPaintingsCategoryPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const artworks = mockArtworks.filter((art) => art.category === 'silk-painting');
+  const artworks = await getArtworksByCategory('silk-painting');
 
   return (
     <Section spacing="default" className="bg-[#FAF8F4] min-h-[75vh]">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { mockArtworks } from '@/lib/mockData';
+import { getArtworksByCategory } from '@/lib/api';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
 import ArtworkGrid from '@/components/artwork/ArtworkGrid';
@@ -10,7 +10,7 @@ export default async function BuddhistArtCategoryPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const artworks = mockArtworks.filter((art) => art.category === 'buddhist-art');
+  const artworks = await getArtworksByCategory('buddhist-art');
 
   return (
     <Section spacing="default" className="bg-[#FAF8F4] min-h-[75vh]">

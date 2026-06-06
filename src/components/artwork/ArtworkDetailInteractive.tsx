@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { type ArtworkDocument, type Locale } from '@/types';
-import { getMockImageUrl } from '@/lib/mockData';
+import { getImageUrl } from '@/lib/sanity';
 import Container from '../layout/Container';
 import Section from '../layout/Section';
 import Button from '../ui/Button';
@@ -90,7 +90,7 @@ export default function ArtworkDetailInteractive({
                 onClick={() => setIsLightboxOpen(true)}
               >
                 <Image
-                  src={getMockImageUrl(imagesList[activeImageIndex]?.asset?._ref)}
+                  src={getImageUrl(imagesList[activeImageIndex])}
                   alt={imagesList[activeImageIndex]?.alt_en || title}
                   fill
                   priority
@@ -110,7 +110,7 @@ export default function ArtworkDetailInteractive({
                       }`}
                     >
                       <Image
-                        src={getMockImageUrl(img.asset?._ref)}
+                        src={getImageUrl(img)}
                         alt={`Closeup detail ${idx}`}
                         fill
                         className="object-cover"
@@ -198,7 +198,7 @@ export default function ArtworkDetailInteractive({
                 >
                   <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm border border-charcoal/5">
                     <Image
-                      src={getMockImageUrl(img.asset?._ref)}
+                      src={getImageUrl(img)}
                       alt={img.alt_en || 'Artwork Closeup'}
                       fill
                       className="object-cover transform scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"
@@ -399,7 +399,7 @@ export default function ArtworkDetailInteractive({
       <Lightbox
         isOpen={isLightboxOpen}
         onClose={() => setIsLightboxOpen(false)}
-        imageUrl={getMockImageUrl(imagesList[activeImageIndex]?.asset?._ref)}
+        imageUrl={getImageUrl(imagesList[activeImageIndex])}
         altText={imagesList[activeImageIndex]?.alt_en}
       />
 

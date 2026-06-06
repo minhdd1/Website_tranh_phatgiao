@@ -2,7 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { type Metadata } from 'next';
-import { mockArtworks, mockBlogs, getMockImageUrl } from '@/lib/mockData';
+import { getFeaturedArtworks, getLatestBlogs } from '@/lib/api';
+import { getImageUrl } from '@/lib/sanity';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
 import ArtworkGrid from '@/components/artwork/ArtworkGrid';
@@ -23,9 +24,9 @@ export default async function HomePage({
   const loc = locale as Locale;
 
 
-  // Filter out featured artworks for highlights
-  const featuredArtworks = mockArtworks.filter((art) => art.featured).slice(0, 3);
-  const latestBlogs = mockBlogs.slice(0, 2);
+  // Fetch featured artworks and blogs from API
+  const featuredArtworks = await getFeaturedArtworks();
+  const latestBlogs = await getLatestBlogs(2);
 
   // Harmonious high-res studio/hero images from Unsplash
   const heroImageSrc = 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1600&auto=format&fit=crop'; // Zen abstract
@@ -202,7 +203,7 @@ export default async function HomePage({
               <article key={blog._id} className="flex flex-col gap-6 text-left group">
                 <Link href={`/${locale}/blog/${blog.slug.current}`} className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl border border-charcoal/5 shadow-sm block">
                   <Image
-                    src={getMockImageUrl(blog.coverImage.asset?._ref)}
+                    src={getImageUrl(blog.coverImage)}
                     alt={blog.title[loc]}
                     fill
                     className="object-cover transform scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"

@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { type ArtworkDocument } from '@/types';
-import { getMockImageUrl } from '@/lib/mockData';
+import { getImageUrl } from '@/lib/sanity';
 import { useTranslation } from '@/hooks/useTranslation';
 import Badge from '../ui/Badge';
 
@@ -17,7 +17,7 @@ export default function ArtworkCard({ artwork }: ArtworkCardProps) {
   const title = artwork.title[locale];
   const excerpt = artwork.excerpt[locale];
   const materials = artwork.materials[locale];
-  const imageSrc = getMockImageUrl(artwork.images[0]?.asset?._ref);
+  const imageSrc = getImageUrl(artwork.images[0]);
 
   return (
     <Link

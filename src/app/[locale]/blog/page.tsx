@@ -2,7 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { type Metadata } from 'next';
-import { mockBlogs, getMockImageUrl } from '@/lib/mockData';
+import { getBlogs } from '@/lib/api';
+import { getImageUrl } from '@/lib/sanity';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
 
@@ -20,6 +21,7 @@ export default async function BlogPage({
 }) {
   const { locale } = await params;
   const loc = locale as Locale;
+  const blogs = await getBlogs();
 
 
   return (
@@ -42,14 +44,14 @@ export default async function BlogPage({
 
         {/* List of articles */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 max-w-5xl mx-auto">
-          {mockBlogs.map((blog) => (
+          {blogs.map((blog) => (
             <article key={blog._id} className="flex flex-col gap-6 text-left group">
               <Link
                 href={`/${locale}/blog/${blog.slug.current}`}
                 className="relative w-full aspect-[16/10] overflow-hidden rounded-2xl border border-charcoal/5 shadow-sm block"
               >
                 <Image
-                  src={getMockImageUrl(blog.coverImage.asset?._ref)}
+                  src={getImageUrl(blog.coverImage)}
                   alt={blog.title[loc]}
                   fill
                   className="object-cover transform scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"

@@ -1,0 +1,807 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "vi",
+        "type": "string",
+        "title": "Vietnamese (Default)"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "en",
+        "type": "string",
+        "title": "English"
+      }
+    ],
+    "name": "localizedString",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "rows": 5,
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "vi",
+        "type": "text",
+        "title": "Vietnamese (Default)"
+      },
+      {
+        "rows": 5,
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "en",
+        "type": "text",
+        "title": "English"
+      }
+    ],
+    "name": "localizedText",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "title",
+        "type": "localizedString"
+      },
+      {
+        "options": {
+          "source": "title.en",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "name": "excerpt",
+        "type": "localizedString",
+        "title": "Short Excerpt"
+      },
+      {
+        "name": "description",
+        "type": "localizedText",
+        "title": "Artwork Story / Narrative"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Silk Painting",
+              "value": "silk-painting"
+            },
+            {
+              "title": "Sculptural Painting",
+              "value": "sculptural-painting"
+            },
+            {
+              "title": "Buddhist Art",
+              "value": "buddhist-art"
+            },
+            {
+              "title": "Commissioned Works",
+              "value": "commissioned"
+            }
+          ],
+          "layout": "radio"
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "silk-painting",
+                  "sculptural-painting",
+                  "buddhist-art",
+                  "commissioned"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "message": "Artworks need at least 1 image (Hero)."
+          }
+        ],
+        "of": [
+          {
+            "options": {
+              "hotspot": true
+            },
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "level": "error",
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ]
+                  }
+                ],
+                "name": "alt_vi",
+                "type": "string",
+                "title": "Alt Text (Vietnamese)"
+              },
+              {
+                "validation": [
+                  {
+                    "level": "error",
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ]
+                  }
+                ],
+                "name": "alt_en",
+                "type": "string",
+                "title": "Alt Text (English)"
+              }
+            ],
+            "type": "image"
+          }
+        ],
+        "name": "images",
+        "type": "array",
+        "title": "Gallery Images"
+      },
+      {
+        "options": {
+          "accept": "video/mp4,video/quicktime"
+        },
+        "description": "Slow panning close-up of textural details (10-30s duration, soft ambient studio audio).",
+        "name": "video",
+        "type": "file",
+        "title": "Texture Video Demonstration"
+      },
+      {
+        "description": "Example: \"80 x 100 cm (with frame)\"",
+        "name": "dimensions",
+        "type": "localizedString"
+      },
+      {
+        "description": "Example: \"Natural mineral pigment on traditional silk\"",
+        "name": "materials",
+        "type": "localizedString",
+        "title": "Materials & Techniques"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ]
+          }
+        ],
+        "name": "price",
+        "type": "number",
+        "title": "Price Tag"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "VND",
+              "value": "VND"
+            },
+            {
+              "title": "USD",
+              "value": "USD"
+            }
+          ]
+        },
+        "initialValue": "VND",
+        "name": "currency",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Available",
+              "value": "available"
+            },
+            {
+              "title": "Sold",
+              "value": "sold"
+            },
+            {
+              "title": "Commission Open",
+              "value": "commission-open"
+            }
+          ]
+        },
+        "initialValue": "available",
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "available",
+                  "sold",
+                  "commission-open"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "status",
+        "type": "string",
+        "title": "Availability Status"
+      },
+      {
+        "initialValue": false,
+        "description": "Displays item prominently on front page curation highlights.",
+        "name": "featured",
+        "type": "boolean",
+        "title": "Featured Placement"
+      },
+      {
+        "fields": [
+          {
+            "name": "title",
+            "type": "localizedString",
+            "title": "Meta Title Override"
+          },
+          {
+            "name": "description",
+            "type": "localizedText",
+            "title": "Meta Description Override"
+          }
+        ],
+        "name": "seo",
+        "type": "object",
+        "title": "SEO Metadata"
+      }
+    ],
+    "name": "artwork",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "title",
+        "type": "localizedString",
+        "title": "Collection Title"
+      },
+      {
+        "options": {
+          "source": "title.en",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "name": "description",
+        "type": "localizedText",
+        "title": "Collection Context Story"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "coverImage",
+        "type": "image",
+        "title": "Cover Hero Image"
+      }
+    ],
+    "name": "collection",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "title",
+        "type": "localizedString",
+        "title": "Article Title"
+      },
+      {
+        "options": {
+          "source": "title.en",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "coverImage",
+        "type": "image",
+        "title": "Banner Cover Image"
+      },
+      {
+        "fields": [
+          {
+            "validation": [
+              {
+                "level": "error",
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ]
+              }
+            ],
+            "of": [
+              {
+                "lists": [
+                  {
+                    "value": "bullet",
+                    "title": "Bulleted list"
+                  },
+                  {
+                    "value": "number",
+                    "title": "Numbered list"
+                  }
+                ],
+                "marks": {
+                  "annotations": [
+                    {
+                      "i18nTitleKey": "inputs.portable-text.annotation.link",
+                      "options": {
+                        "modal": {
+                          "type": "popover"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "validation": [
+                            {
+                              "level": "error",
+                              "rules": [
+                                {
+                                  "flag": "uri",
+                                  "constraint": {
+                                    "options": {
+                                      "scheme": [
+                                        "/^http$/",
+                                        "/^https$/",
+                                        "/^tel$/",
+                                        "/^mailto$/"
+                                      ],
+                                      "allowRelative": true,
+                                      "relativeOnly": false,
+                                      "allowCredentials": false
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ],
+                          "description": "A valid web, email, phone, or relative link.",
+                          "name": "href",
+                          "type": "url",
+                          "title": "Link"
+                        }
+                      ],
+                      "name": "link",
+                      "type": "object"
+                    }
+                  ],
+                  "decorators": [
+                    {
+                      "value": "strong",
+                      "title": "Strong"
+                    },
+                    {
+                      "value": "em",
+                      "title": "Italic"
+                    },
+                    {
+                      "value": "code",
+                      "title": "Code"
+                    },
+                    {
+                      "value": "underline",
+                      "title": "Underline"
+                    },
+                    {
+                      "value": "strike-through",
+                      "title": "Strike"
+                    }
+                  ]
+                },
+                "of": [],
+                "styles": [
+                  {
+                    "value": "normal",
+                    "title": "Normal"
+                  },
+                  {
+                    "value": "h1",
+                    "title": "Heading 1"
+                  },
+                  {
+                    "value": "h2",
+                    "title": "Heading 2"
+                  },
+                  {
+                    "value": "h3",
+                    "title": "Heading 3"
+                  },
+                  {
+                    "value": "h4",
+                    "title": "Heading 4"
+                  },
+                  {
+                    "value": "h5",
+                    "title": "Heading 5"
+                  },
+                  {
+                    "value": "h6",
+                    "title": "Heading 6"
+                  },
+                  {
+                    "value": "blockquote",
+                    "title": "Quote"
+                  }
+                ],
+                "type": "block"
+              },
+              {
+                "type": "image"
+              }
+            ],
+            "name": "vi",
+            "type": "array",
+            "title": "Vietnamese Block Text"
+          },
+          {
+            "validation": [
+              {
+                "level": "error",
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ]
+              }
+            ],
+            "of": [
+              {
+                "lists": [
+                  {
+                    "value": "bullet",
+                    "title": "Bulleted list"
+                  },
+                  {
+                    "value": "number",
+                    "title": "Numbered list"
+                  }
+                ],
+                "marks": {
+                  "annotations": [
+                    {
+                      "i18nTitleKey": "inputs.portable-text.annotation.link",
+                      "options": {
+                        "modal": {
+                          "type": "popover"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "validation": [
+                            {
+                              "level": "error",
+                              "rules": [
+                                {
+                                  "flag": "uri",
+                                  "constraint": {
+                                    "options": {
+                                      "scheme": [
+                                        "/^http$/",
+                                        "/^https$/",
+                                        "/^tel$/",
+                                        "/^mailto$/"
+                                      ],
+                                      "allowRelative": true,
+                                      "relativeOnly": false,
+                                      "allowCredentials": false
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ],
+                          "description": "A valid web, email, phone, or relative link.",
+                          "name": "href",
+                          "type": "url",
+                          "title": "Link"
+                        }
+                      ],
+                      "name": "link",
+                      "type": "object"
+                    }
+                  ],
+                  "decorators": [
+                    {
+                      "value": "strong",
+                      "title": "Strong"
+                    },
+                    {
+                      "value": "em",
+                      "title": "Italic"
+                    },
+                    {
+                      "value": "code",
+                      "title": "Code"
+                    },
+                    {
+                      "value": "underline",
+                      "title": "Underline"
+                    },
+                    {
+                      "value": "strike-through",
+                      "title": "Strike"
+                    }
+                  ]
+                },
+                "of": [],
+                "styles": [
+                  {
+                    "value": "normal",
+                    "title": "Normal"
+                  },
+                  {
+                    "value": "h1",
+                    "title": "Heading 1"
+                  },
+                  {
+                    "value": "h2",
+                    "title": "Heading 2"
+                  },
+                  {
+                    "value": "h3",
+                    "title": "Heading 3"
+                  },
+                  {
+                    "value": "h4",
+                    "title": "Heading 4"
+                  },
+                  {
+                    "value": "h5",
+                    "title": "Heading 5"
+                  },
+                  {
+                    "value": "h6",
+                    "title": "Heading 6"
+                  },
+                  {
+                    "value": "blockquote",
+                    "title": "Quote"
+                  }
+                ],
+                "type": "block"
+              },
+              {
+                "type": "image"
+              }
+            ],
+            "name": "en",
+            "type": "array",
+            "title": "English Block Text"
+          }
+        ],
+        "name": "content",
+        "type": "object",
+        "title": "Manually Translated Editorial Rich Content"
+      },
+      {
+        "to": [
+          {
+            "type": "author"
+          }
+        ],
+        "name": "author",
+        "type": "reference",
+        "title": "Author Profile"
+      },
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "publishedAt",
+        "type": "datetime",
+        "title": "Publication Date"
+      },
+      {
+        "fields": [
+          {
+            "name": "title",
+            "type": "localizedString",
+            "title": "Meta Title Override"
+          },
+          {
+            "name": "description",
+            "type": "localizedText",
+            "title": "Meta Description Override"
+          }
+        ],
+        "name": "seo",
+        "type": "object",
+        "title": "SEO Overrides"
+      }
+    ],
+    "name": "blog",
+    "type": "document",
+    "title": "Blog / Curation Journal"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "name",
+        "type": "string",
+        "title": "Full Name"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "avatar",
+        "type": "image",
+        "title": "Avatar Image"
+      }
+    ],
+    "name": "author",
+    "type": "document",
+    "title": "Author Profile"
+  }
+]
