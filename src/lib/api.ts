@@ -1,106 +1,174 @@
-import { sanityClient, isSanityConfigured } from './sanity';
+import { defineQuery } from 'next-sanity';
+import { client } from '@/sanity/lib/client';
 import { mockArtworks, mockBlogs } from './mockData';
-import { type ArtworkDocument, type BlogDocument } from '@/types';
+import { type ArtworkCategory, type ArtworkDocument, type BlogDocument } from '@/types';
 
-// ARTWORK FETCHING FUNCTIONS
-export async function getArtworks(): Promise<ArtworkDocument[]> {
-  if (isSanityConfigured && sanityClient) {
-    try {
-      console.log('⚡ [Sanity CMS] Fetching all artworks...');
-      const query = `*[_type == "artwork"] | order(_createdAt desc)`;
-      const results = await sanityClient.fetch<ArtworkDocument[]>(query);
-      if (results && results.length > 0) return results;
-    } catch (e) {
-      console.error('Error fetching artworks from Sanity:', e);
+const useMockFallback = process.env.NODE_ENV !== 'production';
+
+const imageProjection = /* groq */ `
+  _key,
+  _type,
+  asset,
+  alt_vi,
+  alt_en
+`;
+
+const seoProjection = /* groq */ `
+  title,
+  description,
+  keywords,
+  ogImage { ${imageProjection} }
+`;
+
+const artworkProjection = /* groq */ `
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  title,
+  slug,
+  excerpt,
+  description,
+  category,
+  images[] { ${imageProjection} },
+  video,
+  dimensions,
+  materials,
+  specifications[]{
+    _key,
+    label,
+    value
+  },
+  contentSections[]{
+    _key,
+    _type,
+    _type == "textBlock" => {
+      eyebrow,
+      title,
+      body
+    },
+    _type == "imageGallery" => {
+      title,
+      description,
+      images[] { ${imageProjection} }
     }
+  },
+  price,
+  currency,
+  status,
+  featured,
+  seo { ${seoProjection} }
+`;
+
+const blogProjection = /* groq */ `
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  publishedAt,
+  title,
+  slug,
+  coverImage { ${imageProjection} },
+  content,
+  "author": coalesce(author->{name, avatar { ${imageProjection} }}, author),
+  seo { ${seoProjection} }
+`;
+
+const ARTWORKS_QUERY = defineQuery(`*[_type == "artwork"] | order(_createdAt desc) { ${artworkProjection} }`);
+const FEATURED_ARTWORKS_QUERY = defineQuery(`*[_type == "artwork" && featured == true] | order(_createdAt desc) { ${artworkProjection} }`);
+const ARTWORK_BY_SLUG_QUERY = defineQuery(`*[_type == "artwork" && slug.current == $slug][0] { ${artworkProjection} }`);
+const ARTWORKS_BY_CATEGORY_QUERY = defineQuery(`*[_type == "artwork" && category == $category] | order(_createdAt desc) { ${artworkProjection} }`);
+const BLOGS_QUERY = defineQuery(`*[_type == "blog"] | order(publishedAt desc) { ${blogProjection} }`);
+const LATEST_BLOGS_QUERY = defineQuery(`*[_type == "blog"] | order(publishedAt desc)[0...$limit] { ${blogProjection} }`);
+const BLOG_BY_SLUG_QUERY = defineQuery(`*[_type == "blog" && slug.current == $slug][0] { ${blogProjection} }`);
+
+function fallbackList<T>(items: T[]): T[] {
+  return useMockFallback ? items : [];
+}
+
+function fallbackItem<T>(item: T | undefined): T | null {
+  return useMockFallback ? item || null : null;
+}
+
+function logSanityError(scope: string, error: unknown) {
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(`Error fetching ${scope} from Sanity:`, error);
   }
-  console.log('📦 [MockData] Loading artworks from local mockData.ts');
-  return mockArtworks;
+}
+
+export async function getArtworks(): Promise<ArtworkDocument[]> {
+  try {
+    const results = await client.fetch<ArtworkDocument[]>(ARTWORKS_QUERY);
+    if (results.length > 0) return results;
+  } catch (error) {
+    logSanityError('artworks', error);
+  }
+
+  return fallbackList(mockArtworks);
 }
 
 export async function getFeaturedArtworks(): Promise<ArtworkDocument[]> {
-  if (isSanityConfigured && sanityClient) {
-    try {
-      const query = `*[_type == "artwork" && featured == true] | order(_createdAt desc)`;
-      const results = await sanityClient.fetch<ArtworkDocument[]>(query);
-      if (results && results.length > 0) return results;
-    } catch (e) {
-      console.error('Error fetching featured artworks from Sanity:', e);
-    }
+  try {
+    const results = await client.fetch<ArtworkDocument[]>(FEATURED_ARTWORKS_QUERY);
+    if (results.length > 0) return results;
+  } catch (error) {
+    logSanityError('featured artworks', error);
   }
-  // Fallback to mock data
-  return mockArtworks.filter((art) => art.featured);
+
+  return fallbackList(mockArtworks.filter((art) => art.featured));
 }
 
 export async function getArtworkBySlug(slug: string): Promise<ArtworkDocument | null> {
-  if (isSanityConfigured && sanityClient) {
-    try {
-      console.log(`⚡ [Sanity CMS] Fetching artwork detail for slug: "${slug}"`);
-      const query = `*[_type == "artwork" && slug.current == $slug][0]`;
-      const result = await sanityClient.fetch<ArtworkDocument | null>(query, { slug });
-      if (result) return result;
-    } catch (e) {
-      console.error(`Error fetching artwork by slug (${slug}) from Sanity:`, e);
-    }
+  try {
+    const result = await client.fetch<ArtworkDocument | null>(ARTWORK_BY_SLUG_QUERY, { slug });
+    if (result) return result;
+  } catch (error) {
+    logSanityError(`artwork "${slug}"`, error);
   }
-  console.log(`📦 [MockData] Loading artwork detail for slug: "${slug}" from local mockData.ts`);
-  return mockArtworks.find((art) => art.slug.current === slug) || null;
+
+  return fallbackItem(mockArtworks.find((art) => art.slug.current === slug));
 }
 
-export async function getArtworksByCategory(category: string): Promise<ArtworkDocument[]> {
-  if (isSanityConfigured && sanityClient) {
-    try {
-      const query = `*[_type == "artwork" && category == $category] | order(_createdAt desc)`;
-      const results = await sanityClient.fetch<ArtworkDocument[]>(query, { category });
-      if (results && results.length > 0) return results;
-    } catch (e) {
-      console.error(`Error fetching artworks by category (${category}) from Sanity:`, e);
-    }
+export async function getArtworksByCategory(category: ArtworkCategory): Promise<ArtworkDocument[]> {
+  try {
+    const results = await client.fetch<ArtworkDocument[]>(ARTWORKS_BY_CATEGORY_QUERY, { category });
+    if (results.length > 0) return results;
+  } catch (error) {
+    logSanityError(`artworks in category "${category}"`, error);
   }
-  // Fallback to mock data
-  return mockArtworks.filter((art) => art.category === category);
+
+  return fallbackList(mockArtworks.filter((art) => art.category === category));
 }
 
-// BLOG FETCHING FUNCTIONS
 export async function getBlogs(): Promise<BlogDocument[]> {
-  if (isSanityConfigured && sanityClient) {
-    try {
-      console.log('⚡ [Sanity CMS] Fetching all journal posts...');
-      const query = `*[_type == "blog"] | order(publishedAt desc)`;
-      const results = await sanityClient.fetch<BlogDocument[]>(query);
-      if (results && results.length > 0) return results;
-    } catch (e) {
-      console.error('Error fetching blogs from Sanity:', e);
-    }
+  try {
+    const results = await client.fetch<BlogDocument[]>(BLOGS_QUERY);
+    if (results.length > 0) return results;
+  } catch (error) {
+    logSanityError('blogs', error);
   }
-  console.log('📦 [MockData] Loading journal posts from local mockData.ts');
-  return mockBlogs;
+
+  return fallbackList(mockBlogs);
 }
 
 export async function getLatestBlogs(limit = 2): Promise<BlogDocument[]> {
-  if (isSanityConfigured && sanityClient) {
-    try {
-      const query = `*[_type == "blog"] | order(publishedAt desc)[0...$limit]`;
-      const results = await sanityClient.fetch<BlogDocument[]>(query, { limit });
-      if (results && results.length > 0) return results;
-    } catch (e) {
-      console.error('Error fetching latest blogs from Sanity:', e);
-    }
+  try {
+    const results = await client.fetch<BlogDocument[]>(LATEST_BLOGS_QUERY, { limit });
+    if (results.length > 0) return results;
+  } catch (error) {
+    logSanityError('latest blogs', error);
   }
-  // Fallback to mock data
-  return mockBlogs.slice(0, limit);
+
+  return fallbackList(mockBlogs.slice(0, limit));
 }
 
 export async function getBlogBySlug(slug: string): Promise<BlogDocument | null> {
-  if (isSanityConfigured && sanityClient) {
-    try {
-      const query = `*[_type == "blog" && slug.current == $slug][0]`;
-      const result = await sanityClient.fetch<BlogDocument | null>(query, { slug });
-      if (result) return result;
-    } catch (e) {
-      console.error(`Error fetching blog by slug (${slug}) from Sanity:`, e);
-    }
+  try {
+    const result = await client.fetch<BlogDocument | null>(BLOG_BY_SLUG_QUERY, { slug });
+    if (result) return result;
+  } catch (error) {
+    logSanityError(`blog "${slug}"`, error);
   }
-  // Fallback to mock data
-  return mockBlogs.find((post) => post.slug.current === slug) || null;
+
+  return fallbackItem(mockBlogs.find((post) => post.slug.current === slug));
 }

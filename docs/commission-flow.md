@@ -160,6 +160,8 @@ Name
 
 Email
 
+Phone
+
 Country
 
 Artwork Type
@@ -229,3 +231,25 @@ Never position commissions as a mass-production service.
 Each artwork should feel unique and intentional.
 
 The language should emphasize collaboration, craftsmanship and meaning.
+
+---
+
+# Current Technical Handling
+
+Commission inquiries are submitted through `src/app/api/commissions/route.ts`.
+
+The route currently:
+
+* Validates required fields and basic formats.
+* Limits obvious abuse with lightweight in-memory rate limiting.
+* Avoids logging full personal information.
+* Sends valid submissions to `GOOGLE_SHEETS_WEBAPP_URL`.
+* Returns `503` if the Google Sheets webhook is not configured.
+* Returns `502` if the webhook rejects or fails to save the submission.
+
+The API accepts these artwork type values:
+
+* `silk-painting`
+* `sculptural-painting`
+* `buddhist-art`
+* `commissioned`

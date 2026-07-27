@@ -13,6 +13,33 @@ export interface LocalizedText {
   en: string; // Long form or paragraphs
 }
 
+export interface PortableTextSpan {
+  _key: string;
+  _type: 'span';
+  text: string;
+  marks?: string[];
+}
+
+export interface PortableTextMarkDef {
+  _key: string;
+  _type: string;
+  href?: string;
+}
+
+export interface PortableTextBlock {
+  _key: string;
+  _type: 'block';
+  style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'blockquote';
+  listItem?: 'bullet' | 'number';
+  children?: PortableTextSpan[];
+  markDefs?: PortableTextMarkDef[];
+}
+
+export type LocalizedPortableContent = {
+  vi: string | PortableTextBlock[];
+  en: string | PortableTextBlock[];
+};
+
 /**
  * Common SEO Specifications
  */
@@ -27,6 +54,7 @@ export interface LocalizedSeoMetadata {
  * Image Object derived from Sanity CDN responses
  */
 export interface SanityImageReference {
+  _key?: string;
   _type: 'image';
   asset: {
     _ref: string;
@@ -51,6 +79,30 @@ export type ArtworkCategory = 'silk-painting' | 'sculptural-painting' | 'buddhis
 export type ArtworkStatus = 'available' | 'sold' | 'commission-open';
 export type Currency = 'VND' | 'USD';
 
+export interface ArtworkSpecification {
+  _key?: string;
+  label: LocalizedString;
+  value: LocalizedText;
+}
+
+export interface ArtworkTextSection {
+  _key?: string;
+  _type: 'textBlock';
+  eyebrow?: LocalizedString;
+  title: LocalizedString;
+  body: LocalizedText;
+}
+
+export interface ArtworkImageGallerySection {
+  _key?: string;
+  _type: 'imageGallery';
+  title?: LocalizedString;
+  description?: LocalizedText;
+  images: SanityImageReference[];
+}
+
+export type ArtworkContentSection = ArtworkTextSection | ArtworkImageGallerySection;
+
 export interface ArtworkDocument {
   _id: string;
   _type: 'artwork';
@@ -68,6 +120,8 @@ export interface ArtworkDocument {
   video?: SanityFileReference; // Texture movement demonstration (10-30s)
   dimensions: LocalizedString;  // E.g. "80x100cm"
   materials: LocalizedString;   // E.g. "Sculptural plaster, linen canvas"
+  specifications?: ArtworkSpecification[];
+  contentSections?: ArtworkContentSection[];
   price: number;
   currency: Currency;
   status: ArtworkStatus;
@@ -108,7 +162,7 @@ export interface BlogDocument {
     current: string;
   };
   coverImage: SanityImageReference;
-  content: LocalizedText; // Rich text editor output formatted manually for vi/en
+  content: LocalizedPortableContent;
   author: {
     name: string;
     avatar?: SanityImageReference;

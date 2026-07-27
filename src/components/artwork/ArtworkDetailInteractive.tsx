@@ -41,6 +41,15 @@ export default function ArtworkDetailInteractive({
   const materials = artwork.materials[locale];
   const dimensions = artwork.dimensions[locale];
   const imagesList = artwork.images;
+  const detailImages = imagesList.slice(1);
+  const specifications = (artwork.specifications || []).filter(
+    (spec) => spec.label?.[locale] && spec.value?.[locale]
+  );
+  const contentSections = artwork.contentSections || [];
+
+  const localized = (value?: Partial<Record<Locale, string>>) => {
+    return value?.[locale] || value?.vi || value?.en || '';
+  };
 
   const handleSubmitInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,33 +170,39 @@ export default function ArtworkDetailInteractive({
                   </p>
                 </div>
               </div>
+
+              {specifications.length > 0 && (
+                <div className="border-t border-charcoal/5 pt-8 space-y-5">
+                  <h2 className="font-body text-xs uppercase tracking-widest text-gray-soft">
+                    {locale === 'vi' ? 'Thông Tin Tác Phẩm' : 'Artwork Details'}
+                  </h2>
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+                    {specifications.map((spec, idx) => (
+                      <div key={spec._key || `${localized(spec.label)}-${idx}`} className="space-y-1">
+                        <dt className="font-body text-xs uppercase tracking-widest text-gray-soft/70">
+                          {localized(spec.label)}
+                        </dt>
+                        <dd className="font-body text-sm leading-relaxed text-charcoal">
+                          {localized(spec.value)}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
             </div>
           </div>
         </Container>
       </Section>
 
-      {/* 2. TEXTURAL CLOSEUPS & ROOM VIEW SECTION */}
-      {imagesList.length > 1 && (
+      {/* 2. Artwork detail images */}
+      {detailImages.length > 0 && (
         <Section spacing="default" className="bg-[#EFE7DF]/10 border-y border-charcoal/5">
           <Container className="space-y-16">
-            <div className="text-center space-y-4 max-w-xl mx-auto">
-              <span className="font-body text-xs uppercase tracking-widest text-gray-soft">
-                {locale === 'vi' ? 'Chi Tiết Xúc Giác' : 'Tactile Experience'}
-              </span>
-              <h2 className="font-display text-3xl md:text-4xl font-light text-charcoal tracking-wide">
-                {locale === 'vi' ? 'Sự Dung Dị Của Chất Liệu' : 'The Truth of Material'}
-              </h2>
-              <p className="font-body text-sm text-gray-soft/80 leading-relaxed">
-                {locale === 'vi'
-                  ? 'Chiêm ngưỡng chi tiết thớ lụa, những lớp cát mộc mạc và sự phản chiếu ánh sáng tự nhiên.'
-                  : 'Zoom into organic fabric weaves, sand reliefs, and catch-lights dynamically cast on physical pigments.'}
-              </p>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-              {imagesList.slice(1).map((img, idx) => (
+              {detailImages.map((img, idx) => (
                 <div 
-                  key={idx} 
+                  key={img._key || img.asset?._ref || idx} 
                   className="space-y-4 text-left group cursor-zoom-in"
                   onClick={() => {
                     // Match the index in original list directly from local props
@@ -214,40 +229,75 @@ export default function ArtworkDetailInteractive({
         </Section>
       )}
 
-      {/* 3. DYNAMIC VIDEO TEXTURE DEMO */}
-      <Section spacing="default" className="bg-[#FAF8F4]">
-        <Container>
-          <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Aspect frame representing panning movements */}
-            <div className="relative w-full aspect-[16/9] bg-[#EFE7DF]/30 rounded-2xl border border-charcoal/5 overflow-hidden flex items-center justify-center p-4">
-              <div className="absolute inset-0 bg-[#2F2F2F]/5 z-0" />
-              {/* Atmospheric texture details or simple local loader */}
-              <div className="z-10 text-center space-y-3">
-                <span className="inline-flex w-3 h-3 bg-red-500 rounded-full animate-pulse mr-2" />
-                <span className="font-body text-xs uppercase tracking-widest text-charcoal/70">
-                  {locale === 'vi' ? 'Ghi Hình Tại Studio (Bản Thô)' : 'Studio Footage (Raw Pan)'}
-                </span>
-                <p className="font-body text-[11px] text-gray-soft max-w-xs leading-relaxed">
-                  {locale === 'vi' 
-                    ? '15 giây ghi cận cảnh sự dịch chuyển ánh sáng tự nhiên qua lớp lồi lõm nghệ thuật.' 
-                    : '15s pan demonstrating light casting over tactile plaster reliefs.'}
-                </p>
-              </div>
-            </div>
+      {/* 3. Flexible artwork-specific sections */}
+      {contentSections.length > 0 && (
+        <Section spacing="default" className="bg-[#FAF8F4]">
+          <Container className="space-y-20">
+            {contentSections.map((section, idx) => {
+              if (section._type === 'imageGallery') {
+                const galleryImages = section.images || [];
+                if (galleryImages.length === 0) return null;
 
-            <div className="space-y-4 text-left">
-              <h3 className="font-display text-2xl md:text-3xl font-light text-charcoal tracking-wide">
-                {locale === 'vi' ? 'Ánh Sáng & Chiều Sâu' : 'Light & Dimension'}
-              </h3>
-              <p className="font-body text-sm leading-relaxed text-gray-soft">
-                {locale === 'vi'
-                  ? 'Mỗi tác phẩm đều có sắc độ biến đổi kỳ diệu trong các môi trường ánh sáng khác nhau. Chúng tôi khuyên bạn nên quan sát tác phẩm ở vị trí có nắng xiên nhẹ gần cửa sổ phòng khách.'
-                  : 'Every sculptural canvas shifts shades depending on the environment. We recommend installing original panels close to side-lit windows to fully appreciate the daily shadow dance.'}
-              </p>
-            </div>
-          </div>
-        </Container>
-      </Section>
+                return (
+                  <div key={section._key || idx} className="space-y-10">
+                    {(localized(section.title) || localized(section.description)) && (
+                      <div className="max-w-xl mx-auto text-center space-y-4">
+                        {localized(section.title) && (
+                          <h2 className="font-display text-3xl md:text-4xl font-light text-charcoal tracking-wide">
+                            {localized(section.title)}
+                          </h2>
+                        )}
+                        {localized(section.description) && (
+                          <p className="font-body text-sm leading-relaxed text-gray-soft">
+                            {localized(section.description)}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                      {galleryImages.map((img, imageIdx) => (
+                        <div
+                          key={img._key || img.asset?._ref || imageIdx}
+                          className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm border border-charcoal/5"
+                        >
+                          <Image
+                            src={getImageUrl(img)}
+                            alt={locale === 'vi' ? img.alt_vi || localized(section.title) : img.alt_en || localized(section.title)}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={section._key || idx}
+                  className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[0.75fr_1.25fr] gap-8 lg:gap-16 items-start border-y border-charcoal/5 py-12"
+                >
+                  <div className="space-y-3">
+                    {localized(section.eyebrow) && (
+                      <span className="font-body text-xs uppercase tracking-widest text-gray-soft">
+                        {localized(section.eyebrow)}
+                      </span>
+                    )}
+                    <h2 className="font-display text-3xl md:text-4xl font-light text-charcoal tracking-wide">
+                      {localized(section.title)}
+                    </h2>
+                  </div>
+                  <p className="font-body text-sm md:text-base leading-relaxed text-gray-soft whitespace-pre-line">
+                    {localized(section.body)}
+                  </p>
+                </div>
+              );
+            })}
+          </Container>
+        </Section>
+      )}
 
       {/* 4. BELOW THE FOLD - Price, Acquisition, and Quiet Inquiry Form */}
       <Section id="acquisition" spacing="large" className="bg-[#EFE7DF]/20 border-t border-charcoal/5">

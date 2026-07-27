@@ -140,3 +140,24 @@ GOOGLE_SHEETS_WEBAPP_URL=https://script.google.com/macros/s/XXXXX/exec
 ```
 
 3. Restart your development server (`npm run dev`) or redeploy to Vercel/your hosting provider to apply the environment changes.
+
+---
+
+## Current API Expectations
+
+The website API routes expect the Google Apps Script webhook to return JSON in this shape:
+
+```json
+{ "success": true }
+```
+
+If the webhook returns a non-2xx response, invalid JSON, or `{ "success": false }`, the website API returns an error instead of pretending the submission was saved.
+
+Current website behavior:
+
+- `/api/commissions` validates required fields, email format, artwork type, and text length.
+- `/api/newsletter` validates email format.
+- Both routes apply lightweight in-memory rate limiting.
+- Both routes avoid logging full personal information.
+- Missing `GOOGLE_SHEETS_WEBAPP_URL` returns `503`.
+- Failed Google Sheets save returns `502`.

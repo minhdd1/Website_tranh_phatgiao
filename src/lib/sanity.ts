@@ -1,35 +1,26 @@
-import { createClient } from '@sanity/client';
-import imageUrlBuilder from '@sanity/image-url';
+import { type SanityImageSource } from '@sanity/image-url';
+import { urlFor as sanityUrlFor } from '@/sanity/lib/image';
+import { type SanityImageReference } from '@/types';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '';
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || '';
-const apiVersion = '2024-03-11';
 
 export const isSanityConfigured = !!(projectId && dataset);
 
-export const sanityClient = isSanityConfigured
-  ? createClient({
-      projectId,
-      dataset,
-      apiVersion,
-      useCdn: true,
-    })
-  : null;
-
-const builder = sanityClient ? imageUrlBuilder(sanityClient) : null;
-
-export function urlFor(source: any) {
-  if (!builder || !source) return null;
-  return builder.image(source);
+export function urlFor(source: SanityImageSource | null | undefined) {
+  if (!source) return null;
+  return sanityUrlFor(source);
 }
 
 // Unified image helper that works for both mock Unsplash references and Sanity CDN references
-export function getImageUrl(image: any): string {
+export function getImageUrl(image: SanityImageReference | SanityImageSource | string | null | undefined): string {
   if (!image) {
     return 'https://images.unsplash.com/photo-1579783928621-7a13d66a62d1?q=80&w=800&auto=format&fit=crop';
   }
   
-  const ref = image.asset?._ref || '';
+  const ref = typeof image === 'object' && 'asset' in image && image.asset && '_ref' in image.asset
+    ? image.asset._ref
+    : '';
   
   const imagesMap: Record<string, string> = {
     'image-lotus-hero': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=800&auto=format&fit=crop',
@@ -51,7 +42,7 @@ export function getImageUrl(image: any): string {
   }
 
   // If it's a real Sanity image reference, build the URL
-  if (isSanityConfigured && builder) {
+  if (isSanityConfigured) {
     try {
       const url = urlFor(image)?.url();
       if (url) return url;

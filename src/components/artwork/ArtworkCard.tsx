@@ -32,7 +32,6 @@ export default function ArtworkCard({ artwork }: ArtworkCardProps) {
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out"
-          priority
         />
         {/* Discrete Status Badge Overlay */}
         <div className="absolute top-4 right-4 z-10 opacity-90">

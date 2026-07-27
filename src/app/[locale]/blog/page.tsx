@@ -6,6 +6,7 @@ import { getBlogs } from '@/lib/api';
 import { getImageUrl } from '@/lib/sanity';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
+import { portableToPlainText } from '@/components/blog/PortableContent';
 
 import { type Locale } from '@/types';
 
@@ -72,7 +73,7 @@ export default async function BlogPage({
                   <Link href={`/${locale}/blog/${blog.slug.current}`}>{blog.title[loc]}</Link>
                 </h2>
                 <p className="font-body text-sm leading-relaxed text-gray-soft/90 line-clamp-3">
-                  {blog.content[loc]}
+                  {portableToPlainText(blog.content[loc], 180)}
                 </p>
                 <div className="pt-2">
                   <Link

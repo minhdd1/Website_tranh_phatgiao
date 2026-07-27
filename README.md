@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kayla Nguyen Website
 
-## Getting Started
+Next.js website for an artist/gallery experience powered by Sanity Studio.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS
+- Sanity CMS with embedded Studio at `/studio`
+- Google Sheets webhook for current commission/newsletter submissions
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Verification
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npx.cmd tsc --noEmit --pretty false
+npm.cmd run lint
+npm.cmd run build
+```
 
-## Learn More
+## Key Documentation
 
-To learn more about Next.js, take a look at the following resources:
+- `docs/technical-architecture.md`: current implementation architecture.
+- `docs/sanity-schema.md`: Sanity document models and frontend expectations.
+- `docs/content-workflow.md`: manual Sanity Studio workflow for entering artwork content.
+- `docs/content-strategy.md`: editorial strategy and flexible artwork content rules.
+- `GOOGLE_SHEETS_GUIDE.md`: webhook setup for commission/newsletter submissions.
+- `docs/project-review-report-2026-07-26.md`: project review baseline and implementation update.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Content Workflow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Artwork entries are created manually in Sanity Studio.
 
-## Deploy on Vercel
+Use:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `specifications[]` for flexible artwork facts.
+- `contentSections[]` for per-artwork story sections and image galleries.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+No seed content or import script is required for the current workflow.

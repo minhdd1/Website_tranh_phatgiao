@@ -8,6 +8,7 @@ import { getImageUrl } from '@/lib/sanity';
 import { type Locale } from '@/types';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
+import PortableContent, { portableToPlainText } from '@/components/blog/PortableContent';
 import { ArrowLeft } from 'lucide-react';
 
 interface PageProps {
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${blog.title[locale as Locale]} | Curation Journal`,
-    description: blog.content[locale as Locale].substring(0, 150),
+    description: portableToPlainText(blog.content[locale as Locale], 150),
   };
 }
 
@@ -88,8 +89,8 @@ export default async function BlogPostPage({ params }: PageProps) {
       <Section spacing="default">
         <Container>
           {/* Centered reading column layout */}
-          <div className="max-w-2xl mx-auto font-body text-base sm:text-lg leading-relaxed text-gray-soft space-y-6 text-left whitespace-pre-line first-letter:text-5xl first-letter:font-display first-letter:float-left first-letter:mr-3 first-letter:text-charcoal">
-            {content}
+          <div className="max-w-2xl mx-auto font-body text-base sm:text-lg leading-relaxed text-gray-soft space-y-6 text-left first-letter:text-5xl first-letter:font-display first-letter:float-left first-letter:mr-3 first-letter:text-charcoal">
+            <PortableContent value={content} />
           </div>
           
           {/* Divider */}
