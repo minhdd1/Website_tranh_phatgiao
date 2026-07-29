@@ -91,9 +91,7 @@ function fallbackItem<T>(item: T | undefined): T | null {
 }
 
 function logSanityError(scope: string, error: unknown) {
-  if (process.env.NODE_ENV !== 'production') {
-    console.error(`Error fetching ${scope} from Sanity:`, error);
-  }
+  console.error(`Error fetching ${scope} from Sanity:`, error);
 }
 
 export async function getArtworks(): Promise<ArtworkDocument[]> {

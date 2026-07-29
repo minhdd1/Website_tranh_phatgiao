@@ -2,7 +2,7 @@ import React from 'react';
 import { type PortableTextBlock, type PortableTextSpan } from '@/types';
 
 interface PortableContentProps {
-  value: string | PortableTextBlock[];
+  value?: string | PortableTextBlock[];
 }
 
 function spanText(span: PortableTextSpan) {
@@ -56,6 +56,8 @@ function renderSpan(span: PortableTextSpan, block: PortableTextBlock) {
 }
 
 export default function PortableContent({ value }: PortableContentProps) {
+  if (!value) return null;
+
   if (typeof value === 'string') {
     return <>{value}</>;
   }

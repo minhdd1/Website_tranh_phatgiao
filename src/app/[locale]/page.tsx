@@ -10,6 +10,7 @@ import ArtworkGrid from '@/components/artwork/ArtworkGrid';
 import Button from '@/components/ui/Button';
 import { portableToPlainText } from '@/components/blog/PortableContent';
 import { type Locale } from '@/types';
+import { localizedPortableContent, localizedText } from '@/lib/localized';
 
 export const metadata: Metadata = {
   title: 'Kayla Nguyen | Quiet Art Curation & Gallery',
@@ -200,31 +201,36 @@ export default async function HomePage({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
-            {latestBlogs.map((blog) => (
-              <article key={blog._id} className="flex flex-col gap-6 text-left group">
-                <Link href={`/${locale}/blog/${blog.slug.current}`} className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl border border-charcoal/5 shadow-sm block">
-                  <Image
-                    src={getImageUrl(blog.coverImage)}
-                    alt={blog.title[loc]}
-                    fill
-                    className="object-cover transform scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"
-                  />
-                </Link>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-xs tracking-widest text-gray-soft uppercase font-body">
-                    <span>{new Date(blog.publishedAt).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                    <span>•</span>
-                    <span>{blog.author.name}</span>
+            {latestBlogs.filter((blog) => blog.slug?.current).map((blog) => {
+              const blogTitle = localizedText(blog.title, loc, locale === 'vi' ? 'Bài viết' : 'Article');
+              const blogContent = localizedPortableContent(blog.content, loc);
+
+              return (
+                <article key={blog._id} className="flex flex-col gap-6 text-left group">
+                  <Link href={`/${locale}/blog/${blog.slug.current}`} className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl border border-charcoal/5 shadow-sm block">
+                    <Image
+                      src={getImageUrl(blog.coverImage)}
+                      alt={blog.coverImage?.alt_en || blog.coverImage?.alt_vi || blogTitle}
+                      fill
+                      className="object-cover transform scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"
+                    />
+                  </Link>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 text-xs tracking-widest text-gray-soft uppercase font-body">
+                      <span>{new Date(blog.publishedAt).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <span>•</span>
+                      <span>{blog.author?.name || 'Kayla Nguyen'}</span>
+                    </div>
+                    <h3 className="font-display text-2xl md:text-3xl font-light text-charcoal tracking-wide group-hover:text-charcoal/80 transition-colors duration-300">
+                      <Link href={`/${locale}/blog/${blog.slug.current}`}>{blogTitle}</Link>
+                    </h3>
+                    <p className="font-body text-sm leading-relaxed text-gray-soft/90 max-w-xl line-clamp-3">
+                      {portableToPlainText(blogContent, 180)}
+                    </p>
                   </div>
-                  <h3 className="font-display text-2xl md:text-3xl font-light text-charcoal tracking-wide group-hover:text-charcoal/80 transition-colors duration-300">
-                    <Link href={`/${locale}/blog/${blog.slug.current}`}>{blog.title[loc]}</Link>
-                  </h3>
-                  <p className="font-body text-sm leading-relaxed text-gray-soft/90 max-w-xl line-clamp-3">
-                    {portableToPlainText(blog.content[loc], 180)}
-                  </p>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </Container>
       </Section>

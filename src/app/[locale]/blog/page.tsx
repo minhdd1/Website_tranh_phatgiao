@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { type Metadata } from 'next';
 import { getBlogs } from '@/lib/api';
 import { getImageUrl } from '@/lib/sanity';
+import { localizedPortableContent, localizedText } from '@/lib/localized';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
 import { portableToPlainText } from '@/components/blog/PortableContent';
@@ -45,7 +46,7 @@ export default async function BlogPage({
 
         {/* List of articles */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 max-w-5xl mx-auto">
-          {blogs.map((blog) => (
+          {blogs.filter((blog) => blog.slug?.current).map((blog) => (
             <article key={blog._id} className="flex flex-col gap-6 text-left group">
               <Link
                 href={`/${locale}/blog/${blog.slug.current}`}
@@ -53,7 +54,7 @@ export default async function BlogPage({
               >
                 <Image
                   src={getImageUrl(blog.coverImage)}
-                  alt={blog.title[loc]}
+                  alt={blog.coverImage?.alt_en || blog.coverImage?.alt_vi || localizedText(blog.title, loc, locale === 'vi' ? 'Bài viết' : 'Article')}
                   fill
                   className="object-cover transform scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"
                 />
@@ -67,13 +68,15 @@ export default async function BlogPage({
                     )}
                   </span>
                   <span>•</span>
-                  <span>{blog.author.name}</span>
+                  <span>{blog.author?.name || 'Kayla Nguyen'}</span>
                 </div>
                 <h2 className="font-display text-2xl md:text-3xl font-light text-charcoal tracking-wide group-hover:text-charcoal/80 transition-colors duration-300">
-                  <Link href={`/${locale}/blog/${blog.slug.current}`}>{blog.title[loc]}</Link>
+                  <Link href={`/${locale}/blog/${blog.slug.current}`}>
+                    {localizedText(blog.title, loc, locale === 'vi' ? 'Bài viết' : 'Article')}
+                  </Link>
                 </h2>
                 <p className="font-body text-sm leading-relaxed text-gray-soft/90 line-clamp-3">
-                  {portableToPlainText(blog.content[loc], 180)}
+                  {portableToPlainText(localizedPortableContent(blog.content, loc), 180)}
                 </p>
                 <div className="pt-2">
                   <Link

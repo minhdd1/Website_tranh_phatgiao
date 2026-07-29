@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { type Metadata } from 'next';
 import { getBlogBySlug } from '@/lib/api';
 import { getImageUrl } from '@/lib/sanity';
-import { type Locale } from '@/types';
+import { type Locale, type PortableTextBlock } from '@/types';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
 import PortableContent, { portableToPlainText } from '@/components/blog/PortableContent';
@@ -15,15 +15,35 @@ interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
+const emptyContent: PortableTextBlock[] = [];
+
+function localizedText(
+  value: Partial<Record<Locale, string>> | string | null | undefined,
+  locale: Locale
+) {
+  if (typeof value === 'string') return value;
+  return value?.[locale] || value?.en || value?.vi || '';
+}
+
+function localizedContent(
+  value: Partial<Record<Locale, string | PortableTextBlock[]>> | null | undefined,
+  locale: Locale
+) {
+  const content = value?.[locale] || value?.en || value?.vi;
+  return typeof content === 'string' || Array.isArray(content) ? content : emptyContent;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params;
   const blog = await getBlogBySlug(slug);
 
   if (!blog) return {};
 
+  const loc = locale as Locale;
+
   return {
-    title: `${blog.title[locale as Locale]} | Curation Journal`,
-    description: portableToPlainText(blog.content[locale as Locale], 150),
+    title: `${localizedText(blog.title, loc)} | Curation Journal`,
+    description: portableToPlainText(localizedContent(blog.content, loc), 150),
   };
 }
 
@@ -37,9 +57,12 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
-  const title = blog.title[locale as Locale];
-  const content = blog.content[locale as Locale];
+  const loc = locale as Locale;
+  const title = localizedText(blog.title, loc) || (locale === 'vi' ? 'Bài viết' : 'Article');
+  const content = localizedContent(blog.content, loc);
   const bannerSrc = getImageUrl(blog.coverImage);
+  const authorName = blog.author?.name || 'Kayla Nguyen';
+  const imageAlt = blog.coverImage?.alt_en || title;
 
   return (
     <article className="w-full bg-[#FAF8F4] min-h-screen">
@@ -64,7 +87,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                   )}
                 </span>
                 <span>•</span>
-                <span>{blog.author.name}</span>
+                <span>{authorName}</span>
               </div>
               <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-light text-charcoal tracking-wide leading-tight">
                 {title}
@@ -78,7 +101,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <section className="relative w-full h-[50vh] md:h-[60vh] border-y border-charcoal/5">
         <Image
           src={bannerSrc}
-          alt={blog.coverImage.alt_en || title}
+          alt={imageAlt}
           fill
           priority
           className="object-cover"

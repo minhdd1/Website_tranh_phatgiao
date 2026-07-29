@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { type Metadata } from 'next';
 import { getArtworkBySlug } from '@/lib/api';
 import { type Locale } from '@/types';
+import { localizedText } from '@/lib/localized';
 import ArtworkDetailInteractive from '@/components/artwork/ArtworkDetailInteractive';
 
 interface PageProps {
@@ -15,9 +16,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!artwork) return {};
 
+  const loc = locale as Locale;
+  const title = localizedText(artwork.title, loc, 'Artwork');
+
   return {
-    title: `${artwork.title[locale as Locale]} | Gallery Exhibition`,
-    description: artwork.excerpt[locale as Locale],
+    title: `${title} | Gallery Exhibition`,
+    description: localizedText(artwork.excerpt, loc),
   };
 }
 

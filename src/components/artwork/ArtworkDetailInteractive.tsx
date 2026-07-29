@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { type ArtworkDocument, type Locale } from '@/types';
+import { type ArtworkCategory, type ArtworkDocument, type ArtworkStatus, type Currency, type Locale } from '@/types';
 import { getImageUrl } from '@/lib/sanity';
+import { localizedText } from '@/lib/localized';
 import Container from '../layout/Container';
 import Section from '../layout/Section';
 import Button from '../ui/Button';
@@ -20,6 +21,17 @@ export default function ArtworkDetailInteractive({
   artwork,
   locale,
 }: ArtworkDetailInteractiveProps) {
+  const title = localizedText(artwork.title, locale, locale === 'vi' ? 'Tác phẩm' : 'Artwork');
+  const titleEn = localizedText(artwork.title, 'en', title);
+  const description = localizedText(artwork.description, locale);
+  const materials = localizedText(artwork.materials, locale);
+  const dimensions = localizedText(artwork.dimensions, locale);
+  const imagesList = Array.isArray(artwork.images) ? artwork.images : [];
+  const category = (artwork.category || 'commissioned') as ArtworkCategory;
+  const status = (artwork.status || 'available') as ArtworkStatus;
+  const currency = (artwork.currency || 'VND') as Currency;
+  const price = typeof artwork.price === 'number' ? artwork.price : null;
+
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
@@ -31,24 +43,20 @@ export default function ArtworkDetailInteractive({
   const [country, setCountry] = useState('');
   const [message, setMessage] = useState(
     locale === 'vi' 
-      ? `Tôi muốn đăng ký nhận thêm thông tin chi tiết và liên hệ về tác phẩm "${artwork.title.vi}".`
-      : `I would like to inquire about the pricing and secure acquisition details for the piece "${artwork.title.en}".`
+      ? `Tôi muốn đăng ký nhận thêm thông tin chi tiết và liên hệ về tác phẩm "${title}".`
+      : `I would like to inquire about the pricing and secure acquisition details for the piece "${titleEn}".`
   );
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  const title = artwork.title[locale];
-  const description = artwork.description[locale];
-  const materials = artwork.materials[locale];
-  const dimensions = artwork.dimensions[locale];
-  const imagesList = artwork.images;
+  const activeImage = imagesList[activeImageIndex] || imagesList[0];
   const detailImages = imagesList.slice(1);
   const specifications = (artwork.specifications || []).filter(
-    (spec) => spec.label?.[locale] && spec.value?.[locale]
+    (spec) => localizedText(spec.label, locale) && localizedText(spec.value, locale)
   );
   const contentSections = artwork.contentSections || [];
 
   const localized = (value?: Partial<Record<Locale, string>>) => {
-    return value?.[locale] || value?.vi || value?.en || '';
+    return localizedText(value, locale);
   };
 
   const handleSubmitInquiry = async (e: React.FormEvent) => {
@@ -65,10 +73,10 @@ export default function ArtworkDetailInteractive({
           email,
           phone,
           country,
-          artwork_type: artwork.category,
+          artwork_type: category,
           dimensions,
           budget: 'Original Purchase',
-          message: `Inquiry regarding: ${artwork.title.en}. Notes: ${message}`,
+          message: `Inquiry regarding: ${titleEn}. Notes: ${message}`,
         }),
       });
 
@@ -99,8 +107,8 @@ export default function ArtworkDetailInteractive({
                 onClick={() => setIsLightboxOpen(true)}
               >
                 <Image
-                  src={getImageUrl(imagesList[activeImageIndex])}
-                  alt={imagesList[activeImageIndex]?.alt_en || title}
+                  src={getImageUrl(activeImage)}
+                  alt={activeImage?.alt_en || activeImage?.alt_vi || title}
                   fill
                   priority
                   className="object-cover transition-all duration-700 ease-out"
@@ -135,9 +143,9 @@ export default function ArtworkDetailInteractive({
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
                   <span className="font-body text-xs uppercase tracking-widest text-gray-soft">
-                    {artwork.category.replace('-', ' ')}
+                    {category.replace('-', ' ')}
                   </span>
-                  <Badge status={artwork.status} />
+                  <Badge status={status} />
                 </div>
                 <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-light text-charcoal tracking-wide leading-tight">
                   {title}
@@ -206,7 +214,7 @@ export default function ArtworkDetailInteractive({
                   className="space-y-4 text-left group cursor-zoom-in"
                   onClick={() => {
                     // Match the index in original list directly from local props
-                    const originalIdx = artwork.images.findIndex(image => image.asset?._ref === img.asset?._ref);
+                    const originalIdx = imagesList.findIndex(image => image.asset?._ref === img.asset?._ref);
                     setActiveImageIndex(originalIdx !== -1 ? originalIdx : 1);
                     setIsLightboxOpen(true);
                   }}
@@ -316,14 +324,18 @@ export default function ArtworkDetailInteractive({
               {/* Value listing displays only below fold as per art direction */}
               <div className="py-4">
                 <span className="font-display text-4xl text-charcoal tracking-wider">
-                  {artwork.status === 'sold' ? (
+                  {status === 'sold' ? (
                     <span className="text-gray-soft/50 line-through text-2xl uppercase tracking-widest">
                       {locale === 'vi' ? 'Đã thuộc bộ sưu tập tư nhân' : 'In Private Collection'}
                     </span>
+                  ) : price === null ? (
+                    <span className="text-2xl uppercase tracking-widest">
+                      {locale === 'vi' ? 'Liên hệ để biết giá' : 'Inquiry required'}
+                    </span>
                   ) : (
                     <>
-                      {artwork.price.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}{' '}
-                      <span className="text-xl font-body font-light text-gray-soft">{artwork.currency}</span>
+                      {price.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}{' '}
+                      <span className="text-xl font-body font-light text-gray-soft">{currency}</span>
                     </>
                   )}
                 </span>
@@ -338,7 +350,7 @@ export default function ArtworkDetailInteractive({
             <div className="w-12 h-[1px] bg-charcoal/10 mx-auto" />
 
             {/* Quiet Inquiry Form */}
-            {artwork.status !== 'sold' && (
+            {status !== 'sold' && (
               <form onSubmit={handleSubmitInquiry} className="space-y-6 text-left">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Name */}
@@ -449,8 +461,8 @@ export default function ArtworkDetailInteractive({
       <Lightbox
         isOpen={isLightboxOpen}
         onClose={() => setIsLightboxOpen(false)}
-        imageUrl={getImageUrl(imagesList[activeImageIndex])}
-        altText={imagesList[activeImageIndex]?.alt_en}
+        imageUrl={getImageUrl(activeImage)}
+        altText={activeImage?.alt_en || activeImage?.alt_vi || title}
       />
 
       {/* Success Modal */}
