@@ -1,4 +1,4 @@
-import { type ArtworkDocument, type BlogDocument } from '@/types';
+import { type ArtistStoryDocument, type ArtworkDocument, type BlogDocument } from '@/types';
 
 export const mockArtworks: ArtworkDocument[] = [
   {
@@ -357,6 +357,67 @@ export const mockBlogs: BlogDocument[] = [
     },
   },
 ];
+
+export const mockArtistStory: ArtistStoryDocument = {
+  _id: 'artistStory',
+  _type: 'artistStory',
+  _createdAt: new Date().toISOString(),
+  _updatedAt: new Date().toISOString(),
+  title: {
+    vi: 'Hành Trình Người Nghệ Sĩ',
+    en: 'The Artist Story',
+  },
+  intro: {
+    vi: 'Tìm hiểu thêm về triết lý và sự lựa chọn chất liệu lụa.',
+    en: 'Discover the creative philosophy and choice of silk as a medium.',
+  },
+  body: {
+    vi: 'Câu chuyện này là nơi chia sẻ nền tảng sáng tác của Kayla Nguyen: sự tĩnh lặng, chất liệu tự nhiên và nhịp làm việc chậm rãi. Đây là phần giới thiệu cố định cho trang About, khác với Journal là những bài viết theo từng chủ đề riêng.',
+    en: 'This story introduces Kayla Nguyen’s creative foundation: stillness, natural materials, and a patient rhythm of making. It is the permanent About page story, while the Journal explores individual themes over time.',
+  },
+  storySections: [
+    {
+      _key: 'philosophy',
+      eyebrow: {
+        vi: 'Triết lý',
+        en: 'Philosophy',
+      },
+      title: {
+        vi: 'Sáng tác như một thực hành tĩnh lặng',
+        en: 'Creation as a Practice of Stillness',
+      },
+      body: {
+        vi: 'Mỗi tác phẩm bắt đầu từ quan sát chậm rãi: ánh sáng trên bề mặt vải, nhịp thở trong studio và cảm giác bình yên mà một không gian sống có thể nuôi dưỡng.',
+        en: 'Each work begins with slow observation: light resting on fabric, breath inside the studio, and the quiet a living space can hold.',
+      },
+    },
+    {
+      _key: 'silk',
+      eyebrow: {
+        vi: 'Chất liệu',
+        en: 'Material',
+      },
+      title: {
+        vi: 'Vì sao chọn lụa',
+        en: 'Why Silk',
+      },
+      body: {
+        vi: 'Lụa có độ mong manh và khả năng thấm màu rất riêng. Nó không cho phép sự vội vàng, vì từng lớp màu cần thời gian để lắng xuống và hòa vào thớ vải.',
+        en: 'Silk carries a fragile depth and a distinct way of absorbing color. It does not allow haste; each layer needs time to settle into the weave.',
+      },
+    },
+  ],
+  seo: {
+    title: {
+      vi: 'Hành Trình Người Nghệ Sĩ | Kayla Nguyen',
+      en: 'The Artist Story | Kayla Nguyen',
+    },
+    description: {
+      vi: 'Tìm hiểu triết lý sáng tác, hành trình nghệ sĩ và lý do Kayla Nguyen lựa chọn chất liệu lụa trong thực hành nghệ thuật.',
+      en: 'Discover Kayla Nguyen’s creative philosophy, artist journey, and choice of silk as a contemplative art medium.',
+    },
+  },
+};
 
 // Helper to get real visual Unsplash images for our mock images
 export const getMockImageUrl = (refId: string): string => {
