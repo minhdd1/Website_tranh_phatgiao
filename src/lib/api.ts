@@ -100,7 +100,7 @@ const ARTWORKS_BY_CATEGORY_QUERY = defineQuery(`*[_type == "artwork" && category
 const BLOGS_QUERY = defineQuery(`*[_type == "blog"] | order(publishedAt desc) { ${blogProjection} }`);
 const LATEST_BLOGS_QUERY = defineQuery(`*[_type == "blog"] | order(publishedAt desc)[0...$limit] { ${blogProjection} }`);
 const BLOG_BY_SLUG_QUERY = defineQuery(`*[_type == "blog" && slug.current == $slug][0] { ${blogProjection} }`);
-const ARTIST_STORY_QUERY = defineQuery(`*[_type == "artistStory" && _id == "artistStory"][0] { ${artistStoryProjection} }`);
+const ARTIST_STORY_QUERY = defineQuery(`*[_type == "artistStory"] | order(_updatedAt desc)[0] { ${artistStoryProjection} }`);
 
 function fallbackList<T>(items: T[]): T[] {
   return useMockFallback ? items : [];
