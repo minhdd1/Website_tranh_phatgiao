@@ -5,6 +5,7 @@ import { type ArtistStoryDocument, type ArtworkCategory, type ArtworkDocument, t
 
 const useMockFallback = process.env.NODE_ENV !== 'production';
 const publicFetchOptions = { next: { revalidate: 3600 } } as const;
+const artistStoryFetchOptions = { next: { revalidate: 60 } } as const;
 
 const imageProjection = /* groq */ `
   _key,
@@ -193,7 +194,7 @@ export async function getBlogBySlug(slug: string): Promise<BlogDocument | null> 
 
 export async function getArtistStory(): Promise<ArtistStoryDocument | null> {
   try {
-    const result = await client.fetch<ArtistStoryDocument | null>(ARTIST_STORY_QUERY, {}, publicFetchOptions);
+    const result = await client.fetch<ArtistStoryDocument | null>(ARTIST_STORY_QUERY, {}, artistStoryFetchOptions);
     if (result) return result;
   } catch (error) {
     logSanityError('artist story', error);
