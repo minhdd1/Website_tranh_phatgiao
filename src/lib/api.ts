@@ -1,9 +1,10 @@
 import { defineQuery } from 'next-sanity';
 import { client } from '@/sanity/lib/client';
-import { mockArtworks, mockBlogs } from './mockData';
-import { type ArtworkCategory, type ArtworkDocument, type BlogDocument } from '@/types';
+import { mockArtistStory, mockArtworks, mockBlogs } from './mockData';
+import { type ArtistStoryDocument, type ArtworkCategory, type ArtworkDocument, type BlogDocument } from '@/types';
 
 const useMockFallback = process.env.NODE_ENV !== 'production';
+const publicFetchOptions = { next: { revalidate: 3600 } } as const;
 
 const imageProjection = /* groq */ `
   _key,
@@ -69,8 +70,26 @@ const blogProjection = /* groq */ `
   title,
   slug,
   coverImage { ${imageProjection} },
-  content,
+  "content": coalesce(richContent, content),
   "author": coalesce(author->{name, avatar { ${imageProjection} }}, author),
+  seo { ${seoProjection} }
+`;
+
+const artistStoryProjection = /* groq */ `
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  title,
+  intro,
+  body,
+  heroImage { ${imageProjection} },
+  storySections[]{
+    _key,
+    eyebrow,
+    title,
+    body
+  },
   seo { ${seoProjection} }
 `;
 
@@ -81,6 +100,7 @@ const ARTWORKS_BY_CATEGORY_QUERY = defineQuery(`*[_type == "artwork" && category
 const BLOGS_QUERY = defineQuery(`*[_type == "blog"] | order(publishedAt desc) { ${blogProjection} }`);
 const LATEST_BLOGS_QUERY = defineQuery(`*[_type == "blog"] | order(publishedAt desc)[0...$limit] { ${blogProjection} }`);
 const BLOG_BY_SLUG_QUERY = defineQuery(`*[_type == "blog" && slug.current == $slug][0] { ${blogProjection} }`);
+const ARTIST_STORY_QUERY = defineQuery(`*[_type == "artistStory" && _id == "artistStory"][0] { ${artistStoryProjection} }`);
 
 function fallbackList<T>(items: T[]): T[] {
   return useMockFallback ? items : [];
@@ -96,7 +116,7 @@ function logSanityError(scope: string, error: unknown) {
 
 export async function getArtworks(): Promise<ArtworkDocument[]> {
   try {
-    const results = await client.fetch<ArtworkDocument[]>(ARTWORKS_QUERY);
+    const results = await client.fetch<ArtworkDocument[]>(ARTWORKS_QUERY, {}, publicFetchOptions);
     if (results.length > 0) return results;
   } catch (error) {
     logSanityError('artworks', error);
@@ -107,7 +127,7 @@ export async function getArtworks(): Promise<ArtworkDocument[]> {
 
 export async function getFeaturedArtworks(): Promise<ArtworkDocument[]> {
   try {
-    const results = await client.fetch<ArtworkDocument[]>(FEATURED_ARTWORKS_QUERY);
+    const results = await client.fetch<ArtworkDocument[]>(FEATURED_ARTWORKS_QUERY, {}, publicFetchOptions);
     if (results.length > 0) return results;
   } catch (error) {
     logSanityError('featured artworks', error);
@@ -118,7 +138,7 @@ export async function getFeaturedArtworks(): Promise<ArtworkDocument[]> {
 
 export async function getArtworkBySlug(slug: string): Promise<ArtworkDocument | null> {
   try {
-    const result = await client.fetch<ArtworkDocument | null>(ARTWORK_BY_SLUG_QUERY, { slug });
+    const result = await client.fetch<ArtworkDocument | null>(ARTWORK_BY_SLUG_QUERY, { slug }, publicFetchOptions);
     if (result) return result;
   } catch (error) {
     logSanityError(`artwork "${slug}"`, error);
@@ -129,7 +149,7 @@ export async function getArtworkBySlug(slug: string): Promise<ArtworkDocument | 
 
 export async function getArtworksByCategory(category: ArtworkCategory): Promise<ArtworkDocument[]> {
   try {
-    const results = await client.fetch<ArtworkDocument[]>(ARTWORKS_BY_CATEGORY_QUERY, { category });
+    const results = await client.fetch<ArtworkDocument[]>(ARTWORKS_BY_CATEGORY_QUERY, { category }, publicFetchOptions);
     if (results.length > 0) return results;
   } catch (error) {
     logSanityError(`artworks in category "${category}"`, error);
@@ -140,7 +160,7 @@ export async function getArtworksByCategory(category: ArtworkCategory): Promise<
 
 export async function getBlogs(): Promise<BlogDocument[]> {
   try {
-    const results = await client.fetch<BlogDocument[]>(BLOGS_QUERY);
+    const results = await client.fetch<BlogDocument[]>(BLOGS_QUERY, {}, publicFetchOptions);
     if (results.length > 0) return results;
   } catch (error) {
     logSanityError('blogs', error);
@@ -151,7 +171,7 @@ export async function getBlogs(): Promise<BlogDocument[]> {
 
 export async function getLatestBlogs(limit = 2): Promise<BlogDocument[]> {
   try {
-    const results = await client.fetch<BlogDocument[]>(LATEST_BLOGS_QUERY, { limit });
+    const results = await client.fetch<BlogDocument[]>(LATEST_BLOGS_QUERY, { limit }, publicFetchOptions);
     if (results.length > 0) return results;
   } catch (error) {
     logSanityError('latest blogs', error);
@@ -162,11 +182,22 @@ export async function getLatestBlogs(limit = 2): Promise<BlogDocument[]> {
 
 export async function getBlogBySlug(slug: string): Promise<BlogDocument | null> {
   try {
-    const result = await client.fetch<BlogDocument | null>(BLOG_BY_SLUG_QUERY, { slug });
+    const result = await client.fetch<BlogDocument | null>(BLOG_BY_SLUG_QUERY, { slug }, publicFetchOptions);
     if (result) return result;
   } catch (error) {
     logSanityError(`blog "${slug}"`, error);
   }
 
   return fallbackItem(mockBlogs.find((post) => post.slug.current === slug));
+}
+
+export async function getArtistStory(): Promise<ArtistStoryDocument | null> {
+  try {
+    const result = await client.fetch<ArtistStoryDocument | null>(ARTIST_STORY_QUERY, {}, publicFetchOptions);
+    if (result) return result;
+  } catch (error) {
+    logSanityError('artist story', error);
+  }
+
+  return fallbackItem(mockArtistStory);
 }

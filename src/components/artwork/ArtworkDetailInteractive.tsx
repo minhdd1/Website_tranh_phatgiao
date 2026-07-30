@@ -224,7 +224,7 @@ export default function ArtworkDetailInteractive({
                       src={getImageUrl(img)}
                       alt={img.alt_en || 'Artwork Closeup'}
                       fill
-                      className="object-cover transform scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"
+                      className="object-cover transform scale-100 group-hover:scale-[1.03] transition-transform duration-1000 ease-out"
                     />
                   </div>
                   <p className="font-body text-xs text-gray-soft uppercase tracking-widest italic pl-2">

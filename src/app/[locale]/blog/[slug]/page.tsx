@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { type Metadata } from 'next';
 import { getBlogBySlug } from '@/lib/api';
 import { getImageUrl } from '@/lib/sanity';
-import { type Locale, type PortableTextBlock } from '@/types';
+import { type Locale, type PortableTextContentBlock } from '@/types';
 import Container from '@/components/layout/Container';
 import Section from '@/components/layout/Section';
 import PortableContent, { portableToPlainText } from '@/components/blog/PortableContent';
@@ -15,7 +15,7 @@ interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
-const emptyContent: PortableTextBlock[] = [];
+const emptyContent: PortableTextContentBlock[] = [];
 
 function localizedText(
   value: Partial<Record<Locale, string>> | string | null | undefined,
@@ -26,7 +26,7 @@ function localizedText(
 }
 
 function localizedContent(
-  value: Partial<Record<Locale, string | PortableTextBlock[]>> | null | undefined,
+  value: Partial<Record<Locale, string | PortableTextContentBlock[]>> | null | undefined,
   locale: Locale
 ) {
   const content = value?.[locale] || value?.en || value?.vi;
@@ -40,10 +40,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!blog) return {};
 
   const loc = locale as Locale;
+  const title = localizedText(blog.title, loc);
+  const metaTitle = localizedText(blog.seo?.title, loc);
+  const metaDescription =
+    localizedText(blog.seo?.description, loc) || portableToPlainText(localizedContent(blog.content, loc), 150);
 
   return {
-    title: `${localizedText(blog.title, loc)} | Curation Journal`,
-    description: portableToPlainText(localizedContent(blog.content, loc), 150),
+    title: metaTitle || `${title} | Curation Journal`,
+    description: metaDescription,
+    openGraph: {
+      title: metaTitle || title,
+      description: metaDescription,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: metaTitle || title,
+      description: metaDescription,
+    },
   };
 }
 

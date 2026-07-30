@@ -212,7 +212,7 @@ export default async function HomePage({
                       src={getImageUrl(blog.coverImage)}
                       alt={blog.coverImage?.alt_en || blog.coverImage?.alt_vi || blogTitle}
                       fill
-                      className="object-cover transform scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"
+                      className="object-cover transform scale-100 group-hover:scale-[1.03] transition-transform duration-1000 ease-out"
                     />
                   </Link>
                   <div className="space-y-3">

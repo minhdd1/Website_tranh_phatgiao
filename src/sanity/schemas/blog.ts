@@ -1,11 +1,14 @@
+import SeoMetadataInput from '../components/SeoMetadataInput';
+import { seoDescriptionValidation, seoTitleValidation } from '../lib/seoValidation';
+
 export const blog = {
   name: 'blog',
-  title: 'Blog / Curation Journal',
+  title: 'Journal Article',
   type: 'document',
   fields: [
     {
       name: 'title',
-      title: 'Article Title',
+      title: 'Tiêu đề bài viết / Article Title',
       type: 'localizedString',
     },
     {
@@ -27,24 +30,20 @@ export const blog = {
     },
     {
       name: 'content',
-      title: 'Manually Translated Editorial Rich Content',
-      type: 'object',
-      fields: [
-        {
-          name: 'vi',
-          title: 'Vietnamese Block Text',
-          type: 'array',
-          of: [{ type: 'block' }, { type: 'image' }],
-          validation: (Rule: any) => Rule.required(),
-        },
-        {
-          name: 'en',
-          title: 'English Block Text',
-          type: 'array',
-          of: [{ type: 'block' }, { type: 'image' }],
-          validation: (Rule: any) => Rule.required(),
-        },
-      ],
+      title: 'Legacy plain text content',
+      description: 'Read-only fallback for older articles. Use Rich editorial content for new edits.',
+      type: 'localizedText',
+      readOnly: true,
+      hidden: ({ value }: { value?: unknown }) => value === undefined,
+      deprecated: {
+        reason: 'Use richContent for formatted bilingual article content.',
+      },
+    },
+    {
+      name: 'richContent',
+      title: 'Nội dung bài viết / Rich Editorial Content',
+      description: 'Nhập nội dung giàu định dạng riêng cho tiếng Việt và tiếng Anh.',
+      type: 'localizedPortableContent',
     },
     {
       name: 'author',
@@ -62,9 +61,22 @@ export const blog = {
       name: 'seo',
       title: 'SEO Overrides',
       type: 'object',
+      components: {
+        input: SeoMetadataInput,
+      },
       fields: [
-        { name: 'title', title: 'Meta Title Override', type: 'localizedString' },
-        { name: 'description', title: 'Meta Description Override', type: 'localizedText' },
+        {
+          name: 'title',
+          title: 'Meta Title Override',
+          type: 'localizedString',
+          validation: (Rule: any) => Rule.custom(seoTitleValidation).warning(),
+        },
+        {
+          name: 'description',
+          title: 'Meta Description Override',
+          type: 'localizedText',
+          validation: (Rule: any) => Rule.custom(seoDescriptionValidation).warning(),
+        },
       ],
     },
   ],

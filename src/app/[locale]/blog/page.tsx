@@ -56,7 +56,7 @@ export default async function BlogPage({
                   src={getImageUrl(blog.coverImage)}
                   alt={blog.coverImage?.alt_en || blog.coverImage?.alt_vi || localizedText(blog.title, loc, locale === 'vi' ? 'Bài viết' : 'Article')}
                   fill
-                  className="object-cover transform scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"
+                  className="object-cover transform scale-100 group-hover:scale-[1.03] transition-transform duration-1000 ease-out"
                 />
               </Link>
               <div className="space-y-3">

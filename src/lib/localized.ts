@@ -1,4 +1,4 @@
-import { type Locale, type PortableTextBlock } from '@/types';
+import { type Locale, type PortableTextContentBlock } from '@/types';
 
 export function localizedText(
   value: Partial<Record<Locale, string>> | string | null | undefined,
@@ -10,7 +10,7 @@ export function localizedText(
 }
 
 export function localizedPortableContent(
-  value: Partial<Record<Locale, string | PortableTextBlock[]>> | null | undefined,
+  value: Partial<Record<Locale, string | PortableTextContentBlock[]>> | null | undefined,
   locale: Locale
 ) {
   const content = value?.[locale] || value?.en || value?.vi;

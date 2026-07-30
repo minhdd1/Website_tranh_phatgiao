@@ -15,7 +15,7 @@ const allowedArtworkTypes: ArtworkCategory[] = ['silk-painting', 'sculptural-pai
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  if (isRateLimited(`commission:${ip}`, 3, 60_000)) {
+  if (await isRateLimited(`commission:${ip}`, 3, 60_000)) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 

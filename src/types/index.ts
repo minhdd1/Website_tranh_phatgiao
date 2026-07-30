@@ -31,13 +31,24 @@ export interface PortableTextBlock {
   _type: 'block';
   style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'blockquote';
   listItem?: 'bullet' | 'number';
+  level?: number;
   children?: PortableTextSpan[];
   markDefs?: PortableTextMarkDef[];
 }
 
+export interface PortableTextImageBlock {
+  _key: string;
+  _type: 'image';
+  asset: SanityImageReference['asset'];
+  alt?: string;
+  caption?: string;
+}
+
+export type PortableTextContentBlock = PortableTextBlock | PortableTextImageBlock;
+
 export type LocalizedPortableContent = {
-  vi: string | PortableTextBlock[];
-  en: string | PortableTextBlock[];
+  vi: string | PortableTextContentBlock[];
+  en: string | PortableTextContentBlock[];
 };
 
 /**
@@ -102,6 +113,26 @@ export interface ArtworkImageGallerySection {
 }
 
 export type ArtworkContentSection = ArtworkTextSection | ArtworkImageGallerySection;
+
+export interface ArtistStorySection {
+  _key?: string;
+  eyebrow?: LocalizedString;
+  title: LocalizedString;
+  body: LocalizedText;
+}
+
+export interface ArtistStoryDocument {
+  _id: string;
+  _type: 'artistStory';
+  _createdAt: string;
+  _updatedAt: string;
+  title: LocalizedString;
+  intro: LocalizedText;
+  body?: LocalizedText;
+  heroImage?: SanityImageReference;
+  storySections?: ArtistStorySection[];
+  seo?: LocalizedSeoMetadata;
+}
 
 export interface ArtworkDocument {
   _id: string;

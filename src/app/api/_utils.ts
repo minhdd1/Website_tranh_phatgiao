@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const redisRestUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const redisRestToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 
 export function getClientIp(request: Request) {
   const forwardedFor = request.headers.get('x-forwarded-for');
@@ -8,7 +10,30 @@ export function getClientIp(request: Request) {
   return request.headers.get('x-real-ip') || 'unknown';
 }
 
-export function isRateLimited(key: string, limit = 5, windowMs = 60_000) {
+async function redisCommand<T>(command: string, ...args: Array<string | number>): Promise<T> {
+  if (!redisRestUrl || !redisRestToken) {
+    throw new Error('Redis REST rate limit backend is not configured');
+  }
+
+  const response = await fetch(redisRestUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${redisRestToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify([command, ...args]),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Redis REST command failed with ${response.status}`);
+  }
+
+  const data = await response.json() as { result: T };
+  return data.result;
+}
+
+function isLocallyRateLimited(key: string, limit: number, windowMs: number) {
   const now = Date.now();
   const current = rateLimitStore.get(key);
 
@@ -21,6 +46,25 @@ export function isRateLimited(key: string, limit = 5, windowMs = 60_000) {
 
   current.count += 1;
   return false;
+}
+
+export async function isRateLimited(key: string, limit = 5, windowMs = 60_000) {
+  const redisKey = `rate-limit:${key}`;
+
+  if (redisRestUrl && redisRestToken) {
+    try {
+      const count = await redisCommand<number>('INCR', redisKey);
+      if (count === 1) {
+        await redisCommand<number>('PEXPIRE', redisKey, windowMs);
+      }
+
+      return count > limit;
+    } catch (error) {
+      console.error('Remote rate limit backend failed:', error instanceof Error ? error.message : 'Unknown error');
+    }
+  }
+
+  return isLocallyRateLimited(key, limit, windowMs);
 }
 
 export function badRequest(error: string) {

@@ -5,7 +5,7 @@ const googleSheetsUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL || '';
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  if (isRateLimited(`newsletter:${ip}`, 5, 60_000)) {
+  if (await isRateLimited(`newsletter:${ip}`, 5, 60_000)) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
